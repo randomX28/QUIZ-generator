@@ -1,0 +1,93 @@
+\documentclass[10pt,a4paper]{article}
+\usepackage[top=1.2cm, bottom=1.2cm, left=1.4cm, right=1.4cm]{geometry}
+\usepackage{amsmath, amssymb}
+\usepackage{tabularx}
+\usepackage{array}
+\usepackage{booktabs}
+\usepackage{longtable}
+\usepackage{colortbl}
+\usepackage{xcolor}
+
+\definecolor{headbg}{RGB}{30, 41, 59}
+\definecolor{rowalt}{RGB}{245, 247, 250}
+\definecolor{bordercol}{RGB}{203, 213, 225}
+
+\setlength{\parindent}{0pt}
+
+\begin{document}
+
+\begin{center}
+{\large \textbf{Indian Institute of Technology (Indian School of Mines), Dhanbad}}\\[2.5pt]
+{\normalsize \textbf{Department of Computer Science and Engineering}}\\[2.5pt]
+{\normalsize \textbf{<< (subject_name if subject_name else "Compiler Design") | tex_escape >> (<< (course_code if course_code else "NCSC302") | tex_escape >>) --- << (exam_title if exam_title else "Quiz 1") | tex_escape >>}}\\[3pt]
+{\large \textbf{Master Answer Key Sheet for TAs}}\\[3pt]
+\textit{Total Papers: << papers|length >> \quad | \quad Date: << (exam_date if exam_date else "03-Sept-2026") | tex_escape >> \quad | \quad Max Marks: << (max_marks if max_marks else "10 (2 marks/Q)") | tex_escape >>}
+\end{center}
+
+\vspace{0.2cm}
+\noindent\rule{\textwidth}{0.6pt}
+\vspace{0.25cm}
+
+<% set nq = max_q if (max_q is defined and max_q) else 5 %>
+\renewcommand{\arraystretch}{1.25}
+<% if nq <= 15 %>
+\begin{longtable}{|c|l|<% for i in range(nq) %>c|<% endfor %>}
+\hline
+\rowcolor{headbg}
+\textcolor{white}{\textbf{Paper \#}} & 
+\textcolor{white}{\textbf{Paper Code}}<% for i in range(1, nq + 1) %> & \textcolor{white}{\textbf{Q<< i >>}}<% endfor %> \\
+\hline
+\endhead
+
+\hline
+\multicolumn{<< nq + 2 >>}{|r|}{\textit{\small Continued on next page\dots}} \\
+\hline
+\endfoot
+
+\hline
+\endlastfoot
+
+<% for p in papers %>
+<% if loop.index is odd %>
+\rowcolor{rowalt}
+<% endif %>
+\textbf{<< p.paper_no >>} & \texttt{<< p.uid >>}<% for i in range(nq) %> & \textbf{<< p['keys'].get(i|string, "—") >>}<% endfor %> \\
+\hline
+<% endfor %>
+
+\end{longtable}
+<% else %>
+\begin{longtable}{|c|l|p{12.5cm}|}
+\hline
+\rowcolor{headbg}
+\textcolor{white}{\textbf{Paper \#}} & 
+\textcolor{white}{\textbf{Paper Code}} & 
+\textcolor{white}{\textbf{Answer Key (Q1 -- Q<< nq >>)}} \\
+\hline
+\endhead
+
+\hline
+\multicolumn{3}{|r|}{\textit{\small Continued on next page\dots}} \\
+\hline
+\endfoot
+
+\hline
+\endlastfoot
+
+<% for p in papers %>
+<% if loop.index is odd %>
+\rowcolor{rowalt}
+<% endif %>
+\textbf{<< p.paper_no >>} & \texttt{<< p.uid >>} & <% for i in range(nq) %>\textbf{<< i + 1 >>:}~<< p['keys'].get(i|string, "—") >><% if not loop.last %> \quad <% endif %><% endfor %> \\
+\hline
+<% endfor %>
+
+\end{longtable}
+<% endif %>
+
+\vspace{0.3cm}
+\begin{center}
+\textit{--- End of Master Answer Key Sheet ---}
+\end{center}
+
+\end{document}

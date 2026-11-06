@@ -1,0 +1,96 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage[top=1.5cm, bottom=1.5cm, left=1.6cm, right=1.6cm]{geometry}
+\usepackage{amsmath, amssymb}
+\usepackage{tabularx}
+\usepackage{array}
+\usepackage{graphicx}
+\usepackage{listings}
+
+\lstdefinestyle{code}{
+  basicstyle=\ttfamily\footnotesize,
+  frame=single,
+  breaklines=true,
+  columns=fullflexible,
+  keepspaces=true,
+  aboveskip=4pt,
+  belowskip=4pt,
+  xleftmargin=0.8em
+}
+\lstset{style=code}
+
+\setlength{\parindent}{0pt}
+\pagestyle{plain}
+
+\begin{document}
+\footnotesize
+
+\IfFileExists{iit_logo.png}{%
+\noindent
+\begin{minipage}[c]{0.13\textwidth}
+  \includegraphics[width=\linewidth]{iit_logo.png}
+\end{minipage}\hfill
+\begin{minipage}[c]{0.85\textwidth}
+  \centering
+  {\large \textbf{Indian Institute of Technology (Indian School of Mines), Dhanbad}}\\[2.5pt]
+  {\normalsize \textbf{Department of Computer Science and Engineering}}\\[2.5pt]
+  {\normalsize \textbf{<< subject_name | tex_escape >> (Course Code: << course_code | tex_escape >>)}}\\[3pt]
+  {\large \textbf{MASTER QUESTION PAPER}}\\[2pt]
+  \textit{Complete Question Bank Repository --- (No Marked Answers)}\\[4pt]
+\end{minipage}%
+}{%
+\begin{center}
+{\large \textbf{Indian Institute of Technology (Indian School of Mines), Dhanbad}}\\[2.5pt]
+{\normalsize \textbf{Department of Computer Science and Engineering}}\\[2.5pt]
+{\normalsize \textbf{<< subject_name | tex_escape >> (Course Code: << course_code | tex_escape >>)}}\\[3pt]
+{\large \textbf{MASTER QUESTION PAPER}}\\[2pt]
+\textit{Complete Question Bank Repository --- (No Marked Answers)}\\[4pt]
+\end{center}%
+}
+
+\noindent
+\begin{tabular*}{\textwidth}{@{\extracolsep{\fill}}lll}
+\textbf{Subject:} << subject_name | tex_escape >> & \textbf{Course Code:} << course_code | tex_escape >> & \textbf{Date:} << exam_date | tex_escape >> \\
+\textbf{Total Questions:} << questions|length >> & \textbf{Format:} Multiple Choice & \textbf{Document:} Master Question Paper \\
+\end{tabular*}
+
+\vspace{0.2cm}
+\noindent\textbf{General Instructions:}
+\begin{enumerate}\setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}
+\item This master paper contains the complete archive of all \textbf{<< questions|length >> questions}.
+\item For each objective multiple-choice question, exactly four choices are provided: \textbf{(a)}, \textbf{(b)}, \textbf{(c)}, and \textbf{(d)}.
+\item \textbf{No answer choices are marked or highlighted in this paper.} It serves as a master reference for examination planning, student practice, and test paper assembly.
+\item Marks for each question are displayed in the right margin.
+\end{enumerate}
+
+\vspace{0.1cm}
+\noindent\rule{\textwidth}{0.6pt}
+\vspace{0.2cm}
+
+<% for q in questions %>
+<% set qm = q.marks if (q.marks is defined and q.marks is not none and q.marks != '') else 2 %>
+<% set qm_str = qm | string %>
+<% set qm_display = qm_str if ('mark' in qm_str|lower) else (qm_str ~ (' Mark' if qm_str == '1' else ' Marks')) %>
+\noindent \textbf{<< loop.index >>.} << q.text >> \hfill \textbf{[<< qm_display | tex_escape >>]}
+
+<% if q.question_type == 'objective' and q.option_a %>
+\vspace{0.06cm}
+\noindent
+\begin{tabularx}{\textwidth}{@{}X X@{}}
+(a) << q.option_a >> & (b) << q.option_b >> \\[3pt]
+(c) << q.option_c >> & (d) << q.option_d >> \\
+\end{tabularx}
+
+\vspace{0.22cm}
+<% else %>
+\vspace{0.35cm}
+<% endif %>
+<% endfor %>
+
+\vspace{0.3cm}
+\noindent\rule{\textwidth}{0.6pt}
+\vspace{0.2cm}
+\begin{center}
+\textit{--- End of Master Question Paper (Total << questions|length >> Questions) ---}
+\end{center}
+
+\end{document}

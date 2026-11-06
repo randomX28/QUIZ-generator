@@ -1,0 +1,1091 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Paper Generator — IIT (ISM) Dhanbad</title>
+  <meta name="description" content="IIT (ISM) Dhanbad Paper Generator: generate unique exam papers, manage question banks, and grade student answers." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;600;700&family=Roboto:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css" crossorigin="anonymous" />
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js" crossorigin="anonymous"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" crossorigin="anonymous"></script>
+  <link rel="stylesheet" href="/static/css/style.css?v=5.5" />
+  <script>
+    (function(){
+      try {
+        var t = localStorage.getItem('app-theme') || (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+        document.documentElement.setAttribute('data-theme', t);
+      } catch(e) {}
+    })();
+  </script>
+</head>
+<body>
+  <!-- Animated background -->
+  <div class="bg-grid"></div>
+  <div class="bg-orb orb-1"></div>
+  <div class="bg-orb orb-2"></div>
+  <div class="bg-orb orb-3"></div>
+
+  <!-- App shell -->
+  <div class="app">
+
+    <!-- Top App Header -->
+    <header class="app-header">
+      <!-- Header Left: Institution Brand -->
+      <div class="header-brand">
+        <div class="brand-icon ism-emblem" title="Indian Institute of Technology (Indian School of Mines), Dhanbad">
+          <img src="/static/img/iit_logo.png" alt="IIT (ISM) Dhanbad Emblem" class="brand-logo-img" />
+        </div>
+        <div class="brand-text">
+          <span class="brand-inst">IIT (ISM) DHANBAD</span>
+          <span class="brand-name">Paper Generator</span>
+          <span class="brand-sub">Dept. of Computer Science</span>
+        </div>
+      </div>
+
+      <!-- Header Center: Segmented Navigation Pills -->
+      <nav class="header-nav">
+        <button class="nav-item active" data-tab="admin" id="nav-admin">
+          <span class="nav-icon">🗂</span>
+          <span class="nav-label">Question Bank</span>
+        </button>
+        <button class="nav-item" data-tab="papers" id="nav-papers">
+          <span class="nav-icon">📄</span>
+          <span class="nav-label">Papers</span>
+        </button>
+        <button class="nav-item" data-tab="answers" id="nav-answers">
+          <span class="nav-icon">🔑</span>
+          <span class="nav-label">Answer Keys</span>
+        </button>
+        <button class="nav-item" data-tab="grading" id="nav-grading">
+          <span class="nav-icon">✏️</span>
+          <span class="nav-label">TA Grading</span>
+        </button>
+        <button class="nav-item" data-tab="results" id="nav-results">
+          <span class="nav-icon">📊</span>
+          <span class="nav-label">Results</span>
+        </button>
+      </nav>
+
+      <!-- Header Right: Bank Control, Coverage Popover, Theme Toggle -->
+      <div class="header-actions">
+        <!-- Active Bank Control Pill -->
+        <div class="header-bank-control" title="Active Question Bank">
+          <span class="header-bank-icon">📚</span>
+          <select id="bank-select" class="header-bank-select" title="Switch active question bank"></select>
+          <button type="button" class="btn btn-ghost btn-xs header-bank-btn" id="btn-new-bank" title="Create a new Question Bank / Subject Instance">+ New</button>
+          <button type="button" class="btn btn-ghost btn-xs header-bank-btn" id="btn-delete-bank" title="Delete current bank" style="color:var(--accent-red)">🗑</button>
+        </div>
+
+        <!-- Pool Coverage Popover Trigger -->
+        <div class="coverage-wrap">
+          <button type="button" class="coverage-trigger-btn" id="btn-pool-coverage-toggle" title="View Question Pools Coverage">
+            <span>📊</span>
+            <span class="desktop-only-inline">Pools</span>
+          </button>
+          <div class="coverage-popover hidden" id="popover-pool-coverage">
+            <div class="pool-status" id="pool-status">
+              <div class="pool-status-title">Pool Coverage</div>
+              <div id="pool-bars"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Theme Toggle -->
+        <button type="button" class="btn btn-ghost btn-sm header-theme-btn" id="btn-theme-toggle" title="Toggle between Dark and Light mode">
+          <span id="theme-toggle-icon">🌙</span>
+          <span id="theme-toggle-text" class="desktop-only-inline">Dark Mode</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- Main content -->
+    <main class="main-content">
+
+      <!-- ═══════════════════════════ TAB: ADMIN ═══════════════════════════ -->
+      <section class="tab-panel active" id="tab-admin">
+        <div class="page-header">
+          <div>
+            <h1 class="page-title" id="admin-page-title">Question Bank</h1>
+            <p class="page-sub" id="admin-page-sub">Manage questions across topic pools</p>
+          </div>
+          <div style="display:flex;gap:0.5rem;align-items:center;flex-wrap:wrap">
+            <button class="btn btn-primary" id="btn-add-question">
+              <span>+</span> Add Question
+            </button>
+
+            <!-- Import Dropdown -->
+            <div class="dropdown" id="dropdown-import">
+              <button class="btn btn-ghost" type="button" id="btn-toggle-import">
+                <span>📥</span> Import ▾
+              </button>
+              <div class="dropdown-menu">
+                <button type="button" class="dropdown-item" id="btn-menu-import-latex">
+                  <span>📄</span> Master LaTeX (.tex)
+                </button>
+                <button type="button" class="dropdown-item" id="btn-menu-import-excel">
+                  <span>📊</span> Excel Sheet (.xlsx)
+                </button>
+                <div class="dropdown-divider"></div>
+                <a class="dropdown-item" href="/api/questions/template" download="questions_template.xlsx">
+                  <span>⬇</span> Excel Template (.xlsx)
+                </a>
+                <a class="dropdown-item" href="/api/questions/template/latex" download="master_questions_template.tex">
+                  <span>⬇</span> LaTeX Template (.tex)
+                </a>
+                <a class="dropdown-item" id="link-export-questions-archive" href="/api/questions/export/archive">
+                  <span>📦</span> Export Bank Archive (.zip)
+                </a>
+              </div>
+            </div>
+            <input type="file" id="import-file-input" accept=".xlsx,.xls" style="display:none" />
+            <input type="file" id="import-latex-input" accept=".tex,.txt" style="display:none" />
+
+            <!-- Master Paper Dropdown -->
+            <div class="dropdown" id="dropdown-master">
+              <button class="btn btn-ghost" type="button" id="btn-toggle-master">
+                <span>📄</span> Master Paper ▾
+              </button>
+              <div class="dropdown-menu">
+                <a class="dropdown-item" id="link-master-paper-pdf" href="/api/papers/master-paper/pdf" target="_blank">
+                  <span>👁</span> View Master PDF
+                </a>
+                <a class="dropdown-item" id="link-master-paper-latex" href="/api/papers/master-paper/latex" download="master_question_paper.tex">
+                  <span>⬇</span> Download LaTeX
+                </a>
+              </div>
+            </div>
+
+            <button class="btn btn-danger" id="btn-open-clear-modal" title="Clear questions from bank">
+              <span>🗑️</span> Clear Bank
+            </button>
+          </div>
+        </div>
+
+        <!-- Import result banner -->
+        <div id="import-banner" class="gen-result hidden" style="margin-bottom:1rem"></div>
+
+        <!-- Pool filter tabs (dynamically populated from bank pools) -->
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:0.75rem;flex-wrap:wrap;margin-bottom:1rem">
+          <div class="pool-tabs" id="pool-tabs" style="margin-bottom:0">
+            <button class="pool-tab active" data-pool="all">All</button>
+            <button class="pool-tab-add" id="btn-add-pool" title="Add a new pool to this bank">+ Add Pool</button>
+          </div>
+          <div id="pool-manage-bar" class="hidden" style="display:flex;gap:0.4rem;align-items:center">
+            <button type="button" class="btn btn-ghost btn-sm" id="btn-rename-pool" title="Rename selected pool">✏️ Rename</button>
+            <button type="button" class="btn btn-danger btn-sm" id="btn-delete-pool" title="Delete selected pool and its questions">🗑 Delete Pool</button>
+          </div>
+        </div>
+
+        <!-- Live Search & Type Filter Bar -->
+        <div style="display:flex;align-items:center;gap:0.75rem;margin-bottom:1rem;flex-wrap:wrap">
+          <div style="position:relative;flex:1;min-width:260px">
+            <span style="position:absolute;left:0.75rem;top:50%;transform:translateY(-50%);color:var(--text-muted);font-size:0.9rem;pointer-events:none">🔍</span>
+            <input type="text" id="q-search-input" class="input-field" placeholder="Search questions, formulas, options, or code..." style="padding-left:2.2rem;height:38px;width:100%" />
+            <button id="q-search-clear" class="hidden" style="position:absolute;right:0.6rem;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:0.85rem">✕</button>
+          </div>
+          <div style="display:flex;align-items:center;gap:0.5rem">
+            <select id="q-filter-type" class="input-field" style="height:38px;padding:0.25rem 0.6rem;font-size:0.82rem">
+              <option value="all">All Question Types</option>
+              <option value="objective">Objective (MCQ)</option>
+              <option value="subjective">Subjective</option>
+            </select>
+            <select id="q-filter-difficulty" class="input-field" style="height:38px;padding:0.25rem 0.6rem;font-size:0.82rem">
+              <option value="all">All Difficulties</option>
+              <option value="EASY">Easy</option>
+              <option value="MEDIUM">Medium</option>
+              <option value="HARD">Hard</option>
+            </select>
+            <span id="q-count-indicator" style="font-size:0.8rem;color:var(--text-muted);font-weight:600;white-space:nowrap;padding:0 0.4rem"></span>
+          </div>
+        </div>
+
+        <!-- Question list -->
+        <div class="question-list" id="question-list">
+          <div class="loading-state">Loading questions…</div>
+        </div>
+      </section>
+
+      <!-- ═══════════════════════════ TAB: PAPERS ══════════════════════════ -->
+      <section class="tab-panel" id="tab-papers">
+        <div class="page-header">
+          <div>
+            <h1 class="page-title">Paper Generation</h1>
+            <p class="page-sub">Generate unique printed exam papers across registered students</p>
+          </div>
+          <div>
+            <button type="button" class="btn btn-ghost btn-sm" id="btn-how-it-works" title="How Paper Generation Works" style="gap:0.4rem;font-weight:600">
+              <span>ℹ️</span> How It Works
+            </button>
+          </div>
+        </div>
+
+        <div class="glass-card generate-card">
+          <h2 class="card-title">Generate Papers</h2>
+          <p class="card-desc">Configure exam metadata, select question pools, and generate randomized exam sets.</p>
+          
+          <!-- Paper Format Toggle -->
+          <div class="input-group">
+            <label class="input-label">Paper Format</label>
+            <div class="format-toggle-group">
+              <button type="button" class="format-toggle-btn active" id="toggle-opt-objective" data-type="objective">
+                <span class="format-toggle-icon">🔘</span>
+                <div class="format-toggle-texts">
+                  <span class="format-toggle-title">Objective (MCQ Quiz)</span>
+                  <span class="format-toggle-desc">Questions with 4 shuffled ABCD options</span>
+                </div>
+              </button>
+              <button type="button" class="format-toggle-btn" id="toggle-opt-subjective" data-type="subjective">
+                <span class="format-toggle-icon">📝</span>
+                <div class="format-toggle-texts">
+                  <span class="format-toggle-title">Subjective (Semester Paper)</span>
+                  <span class="format-toggle-desc">Descriptive questions without options</span>
+                </div>
+              </button>
+            </div>
+          </div>
+
+          <!-- Subject & Course -->
+          <div class="form-row">
+            <div class="input-group flex-3">
+              <label class="input-label" for="gen-subject">Subject Name <span class="required">*</span></label>
+              <input type="text" id="gen-subject" class="input-field" placeholder="e.g. Compiler Design" value="Compiler Design" />
+            </div>
+            <div class="input-group flex-2">
+              <label class="input-label" for="gen-course-code">Course Code <span class="required">*</span></label>
+              <input type="text" id="gen-course-code" class="input-field" placeholder="e.g. NCSC302" value="NCSC302" />
+            </div>
+          </div>
+
+          <!-- Exam Title & Exam Date -->
+          <div class="form-row">
+            <div class="input-group flex-3">
+              <label class="input-label" for="gen-exam-title">Exam Title <span class="required">*</span></label>
+              <input type="text" id="gen-exam-title" class="input-field" placeholder="e.g. Quiz 1" value="Quiz 1" />
+            </div>
+            <div class="input-group flex-2">
+              <label class="input-label" for="gen-date">Exam Date <span class="required">*</span></label>
+              <input type="text" id="gen-date" class="input-field" placeholder="e.g. 06-Sept-2026" value="" />
+            </div>
+          </div>
+
+          <!-- Max Marks & Marks per Question -->
+          <div class="form-row">
+            <div class="input-group flex-3">
+              <label class="input-label" for="gen-max-marks">Max Marks <span class="required">*</span></label>
+              <input type="text" id="gen-max-marks" class="input-field" placeholder="e.g. 10 (2 marks per question)" value="10 (2 marks per question)" />
+            </div>
+            <div class="input-group flex-2">
+              <label class="input-label" for="gen-marks-per-q">Marks / Question <span class="input-hint" style="display:inline;font-size:0.75rem;margin:0">(optional)</span></label>
+              <input type="text" id="gen-marks-per-q" class="input-field" placeholder="e.g. 2 Marks" value="2 Marks" />
+            </div>
+          </div>
+
+          <!-- Duration, Questions per Paper & Number of Papers -->
+          <div class="form-row">
+            <div class="input-group flex-2">
+              <label class="input-label" for="gen-duration">Duration <span class="required">*</span></label>
+              <input type="text" id="gen-duration" class="input-field" placeholder="e.g. 30 Minutes" value="30 Minutes" />
+            </div>
+            <div class="input-group flex-2">
+              <label class="input-label" for="gen-questions-per-paper">Questions / Paper <span class="required">*</span></label>
+              <input type="number" id="gen-questions-per-paper" class="input-field" min="1" max="500" value="5" />
+            </div>
+            <div class="input-group flex-2">
+              <label class="input-label" for="gen-count">Number of Sets / Papers <span class="required">*</span></label>
+              <input type="number" id="gen-count" class="input-field" min="1" max="200" value="30" />
+            </div>
+          </div>
+
+          <!-- Variable Pool Selection -->
+          <div class="input-group">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.35rem;flex-wrap:wrap;gap:0.4rem">
+              <label class="input-label" style="margin-bottom:0">Select Pools to Draw From <span class="required">*</span></label>
+              <div style="display:flex;gap:0.4rem;align-items:center;flex-wrap:wrap">
+                <button type="button" class="btn btn-ghost btn-xs" id="btn-select-all-pools" style="padding:0.15rem 0.45rem;font-size:0.73rem">Select All</button>
+                <button type="button" class="btn btn-ghost btn-xs" id="btn-select-nonempty-pools" style="padding:0.15rem 0.45rem;font-size:0.73rem">Non-Empty</button>
+                <label class="checkbox-label" style="font-size:0.76rem;margin-left:0.25rem" title="Specify exact number of questions to pick from each selected pool">
+                  <input type="checkbox" id="gen-custom-per-pool" />
+                  <span>Custom count / pool</span>
+                </label>
+              </div>
+            </div>
+            <div id="gen-pool-selector" class="gen-pool-selector-container">
+              <!-- Dynamically populated from current bank's pools -->
+            </div>
+            <span class="input-hint" id="gen-pool-hint">Questions per paper are spread evenly across checked pools (least-used first).</span>
+          </div>
+
+          <!-- Randomizer Toggle -->
+          <div class="input-group">
+            <label class="checkbox-label" style="font-size:0.85rem">
+              <input type="checkbox" id="gen-randomize" checked />
+              <span><strong>Randomize questions & options across sets</strong></span>
+            </label>
+            <span class="input-hint" id="gen-randomize-hint" style="margin-left:1.5rem">Each paper draws random questions and shuffles options. Uncheck for standardized sets.</span>
+          </div>
+
+          <!-- Instructions -->
+          <div class="input-group">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.25rem">
+              <label class="input-label" for="gen-instructions" style="margin-bottom:0">Instructions</label>
+              <label class="checkbox-label" style="font-size:0.8rem">
+                <input type="checkbox" id="gen-default-instructions" checked />
+                Use default instructions
+              </label>
+            </div>
+            <textarea id="gen-instructions" class="input-field textarea" rows="2" placeholder="Enter quiz instructions…"></textarea>
+          </div>
+
+          <button class="btn btn-primary btn-full" id="btn-generate">
+            ⚡ Generate Papers
+          </button>
+          <div id="gen-result" class="gen-result hidden"></div>
+        </div>
+
+        <!-- Generated papers list -->
+        <div class="glass-card" style="margin-top:1.5rem">
+          <div class="card-header-row">
+            <h2 class="card-title">Generated Papers</h2>
+            <div style="display:flex;gap:0.5rem;align-items:center;flex-wrap:wrap">
+              <a class="btn btn-primary btn-sm" id="link-bulk-pdf" href="/api/papers/bulk/pdf" target="_blank" title="View or print all papers merged into a single multi-page PDF">🖨 Bulk Print All (PDF)</a>
+              <a class="btn btn-ghost btn-sm" id="link-bulk-pdf-dl" href="/api/papers/bulk/pdf?download=true" download="all_papers_bundle.pdf" title="Download merged PDF file">⬇ Merged PDF</a>
+              <a class="btn btn-ghost btn-sm" id="link-bulk-latex" href="/api/papers/bulk/latex" download="all_papers_bundle.tex" title="Download merged LaTeX file">⬇ Bulk LaTeX</a>
+              <button class="btn btn-ghost btn-sm" id="btn-refresh-papers">↺ Refresh</button>
+              <button class="btn btn-danger btn-sm" id="btn-delete-all-papers">🗑 Delete All</button>
+            </div>
+          </div>
+          <div id="papers-list" class="papers-list">
+            <div class="loading-state">Loading papers…</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ═══════════════════════════ TAB: ANSWER KEYS ═════════════════════ -->
+      <section class="tab-panel" id="tab-answers">
+        <div class="page-header">
+          <div>
+            <div style="display:flex;align-items:center;gap:0.75rem">
+              <h1 class="page-title">Master Answer Keys</h1>
+              <span class="paper-badge" id="answers-count-badge" style="font-size:0.8rem">0 Papers</span>
+            </div>
+            <p class="page-sub">Quick solution lookup, printable reference sheets, and exports for manual TA grading</p>
+          </div>
+          <div style="display:flex;gap:0.6rem;align-items:center;flex-wrap:wrap">
+            <a class="btn btn-primary" id="link-ak-pdf" href="/api/papers/answer-keys/pdf" target="_blank" title="View or print compact Master Answer Key sheet">
+              🖨 Printable Master PDF
+            </a>
+            <a class="btn btn-ghost" id="link-ak-excel" href="/api/papers/answer-keys/export/excel" download="master_answer_keys.xlsx" title="Download Excel sheet with all answer keys">
+              📊 Export Excel
+            </a>
+            <a class="btn btn-ghost" id="link-ak-csv" href="/api/papers/answer-keys/export/csv" download="master_answer_keys.csv" title="Download CSV file with all answer keys">
+              📄 Export CSV
+            </a>
+            <button class="btn btn-ghost" id="btn-refresh-answers" title="Reload keys">
+              ↺ Refresh
+            </button>
+          </div>
+        </div>
+
+        <!-- Quick Paper Key Checker -->
+        <div class="glass-card" style="margin-bottom:1.5rem">
+          <div class="card-header-row" style="margin-bottom:0.75rem">
+            <h2 class="card-title" style="font-size:1.05rem">🔍 Instant Paper Key Lookup</h2>
+            <div style="font-size:0.82rem;color:var(--text-muted)">Select any paper to inspect its correct options</div>
+          </div>
+          <div style="display:flex;gap:1rem;align-items:center;flex-wrap:wrap">
+            <select id="qc-paper-select" class="input-field input-mono" style="max-width:320px;cursor:pointer">
+              <option value="">-- Select Paper Code --</option>
+            </select>
+          </div>
+          <div id="qc-result-display" style="margin-top:1rem">
+            <div class="info-text">Select a paper code above to view its instant grading key.</div>
+          </div>
+        </div>
+
+        <!-- Master Answer Keys Table Card -->
+        <div class="glass-card">
+          <div class="card-header-row" style="margin-bottom:1rem">
+            <div>
+              <h2 class="card-title">All Generated Papers Answer Key Index</h2>
+              <p class="card-desc" style="margin-top:0.2rem">Every paper has randomized options. TAs can verify student ABCD responses against the table below.</p>
+            </div>
+            <div style="display:flex;gap:0.6rem;align-items:center">
+              <input
+                type="text"
+                id="search-answers"
+                class="input-field input-mono"
+                placeholder="Search paper code / #..."
+                style="max-width:240px"
+              />
+            </div>
+          </div>
+
+          <div id="answers-table-container">
+            <div class="loading-state">Loading master answer keys…</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ═══════════════════════════ TAB: GRADING ═════════════════════════ -->
+      <section class="tab-panel" id="tab-grading">
+        <div class="page-header">
+          <div>
+            <h1 class="page-title">TA Grading</h1>
+            <p class="page-sub">Evaluate student answer sheets in bulk via Excel or grade individually</p>
+          </div>
+          <div style="display:flex;gap:0.6rem;align-items:center">
+            <a class="btn btn-ghost" href="/api/grade/template" download="ta_grading_template.xlsx">⬇ Download Template</a>
+            <label class="btn btn-primary" for="bulk-grade-file-input" style="cursor:pointer">📥 Upload Excel Sheet</label>
+            <input type="file" id="bulk-grade-file-input" accept=".xlsx,.xls" style="display:none" />
+          </div>
+        </div>
+
+        <!-- Bulk Excel Result Banner -->
+        <div id="bulk-grade-result" class="glass-card hidden" style="margin-bottom:1.5rem; border-color: rgba(79, 142, 247, 0.3);">
+          <div id="bulk-grade-content"></div>
+        </div>
+
+        <div class="grading-layout">
+          <!-- Step 1: Load paper -->
+          <div class="glass-card grading-step" id="step-load-paper">
+            <div class="step-header">
+              <div class="step-badge">1</div>
+              <div>
+                <h2 class="card-title">Single Paper Grading</h2>
+                <p class="card-desc" style="margin-top:0.2rem">Or enter a single paper code to grade one student manually</p>
+              </div>
+            </div>
+
+            <div class="input-row">
+              <input
+                type="text"
+                id="grade-paper-code"
+                class="input-field input-mono input-large"
+                placeholder="e.g. CD-2026-1"
+                autocomplete="off"
+                spellcheck="false"
+              />
+              <button class="btn btn-primary" id="btn-load-paper">Load Paper →</button>
+            </div>
+            <div id="load-error" class="error-msg hidden"></div>
+          </div>
+
+          <!-- Step 2: Enter answers (revealed after paper load) -->
+          <div class="glass-card grading-step hidden" id="step-enter-answers">
+            <div class="step-header">
+              <div class="step-badge">2</div>
+              <h2 class="card-title">Enter Student Details & Answers</h2>
+              <div style="display:flex;align-items:center;gap:0.6rem">
+                <div class="paper-badge" id="loaded-paper-badge"></div>
+                <button class="btn btn-ghost btn-sm" id="btn-view-loaded-paper" type="button">👁 View Paper</button>
+                <button class="btn btn-ghost btn-sm" id="btn-view-loaded-key" type="button">🔑 View Key</button>
+              </div>
+            </div>
+
+            <div class="input-group" style="max-width:320px">
+              <label class="input-label">Student Roll Number <span style="font-size:0.78rem;color:var(--text-muted);font-family:'JetBrains Mono',monospace">(e.g. 21CS0001)</span></label>
+              <input
+                type="text"
+                id="grade-roll-no"
+                class="input-field input-mono"
+                placeholder="21CS0001"
+                maxlength="8"
+                pattern="[0-9]{2}[A-Za-z]{2}[0-9]{4}"
+                title="Format: 2 digits, 2 letters, 4 digits (e.g. 21CS0001)"
+                autocomplete="off"
+                spellcheck="false"
+              />
+            </div>
+
+            <div class="questions-form" id="questions-form">
+              <!-- Dynamically populated -->
+            </div>
+
+            <div class="grading-actions">
+              <button class="btn btn-ghost" id="btn-clear-grade">Clear</button>
+              <button class="btn btn-success btn-lg" id="btn-submit-grade">✓ Grade Student</button>
+            </div>
+          </div>
+
+          <!-- Step 3: Result -->
+          <div class="glass-card grading-step hidden" id="step-result">
+            <div class="step-header">
+              <div class="step-badge">3</div>
+              <h2 class="card-title">Result</h2>
+            </div>
+            <div id="grade-result-display"></div>
+            <div class="grading-actions" style="margin-top:1.5rem">
+              <button class="btn btn-primary" id="btn-grade-next" style="display:none">⏭ Grade Next Paper</button>
+              <button class="btn btn-ghost" id="btn-grade-another">Grade Another Student (Same Paper) →</button>
+              <button class="btn btn-ghost" id="btn-new-paper">Change Paper Code</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ═══════════════════════════ TAB: RESULTS ═════════════════════════ -->
+      <section class="tab-panel" id="tab-results">
+        <div class="page-header">
+          <div>
+            <h1 class="page-title">Results Dashboard</h1>
+            <p class="page-sub">Class performance overview, statistics, and student lookup</p>
+          </div>
+          <div style="display:flex;gap:0.6rem;align-items:center;flex-wrap:wrap">
+            <button class="btn btn-ghost" id="btn-refresh-results-top" title="Refresh all results and stats">↺ Refresh</button>
+            <button class="btn btn-ghost" id="btn-export-csv" title="Download all results as CSV">⬇ Export CSV</button>
+            <button class="btn btn-danger" id="btn-nullify-all-results" title="Clear and nullify all graded student results">🗑 Nullify All Results</button>
+          </div>
+        </div>
+
+        <!-- Stats cards -->
+        <div class="stats-row" id="stats-row">
+          <div class="stat-card">
+            <div class="stat-value" id="stat-count">—</div>
+            <div class="stat-label">Students Graded</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value" id="stat-avg">—</div>
+            <div class="stat-label">Average Score</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value" id="stat-pass">—</div>
+            <div class="stat-label">Pass Rate</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value" id="stat-max">—</div>
+            <div class="stat-label">Top Score</div>
+          </div>
+        </div>
+
+        <!-- Score distribution -->
+        <div class="glass-card" style="margin-bottom:1.5rem">
+          <h2 class="card-title">Score Distribution</h2>
+          <div class="distribution-chart" id="distribution-chart"></div>
+        </div>
+
+        <!-- Roll number lookup -->
+        <div class="glass-card" style="margin-bottom:1.5rem">
+          <h2 class="card-title">Student Lookup</h2>
+          <div class="input-row" style="margin-bottom:0">
+            <input
+              type="text"
+              id="lookup-roll"
+              class="input-field input-mono"
+              placeholder="e.g. 21CS0001"
+              maxlength="8"
+              pattern="[0-9]{2}[A-Za-z]{2}[0-9]{4}"
+              title="Format: 2 digits, 2 letters, 4 digits (e.g. 21CS0001)"
+              autocomplete="off"
+              spellcheck="false"
+            />
+            <button class="btn btn-primary" id="btn-lookup">Search</button>
+          </div>
+          <div id="lookup-result" class="lookup-result hidden"></div>
+        </div>
+
+        <!-- Results table -->
+        <div class="glass-card">
+          <div class="card-header-row">
+            <div>
+              <h2 class="card-title">All Student Submissions</h2>
+              <p class="card-desc" style="margin-top:0.2rem">Complete log of all graded papers and scores</p>
+            </div>
+            <div style="display:flex;gap:0.5rem;align-items:center">
+              <button class="btn btn-ghost btn-sm" id="btn-refresh-results">↺ Refresh</button>
+              <button class="btn btn-danger btn-sm" id="btn-nullify-all-results-tbl">🗑 Nullify All</button>
+            </div>
+          </div>
+          <div id="results-table-wrap" class="table-wrap">
+            <div class="loading-state">Loading results…</div>
+          </div>
+        </div>
+      </section>
+
+    </main>
+
+    <!-- Mobile Bottom Navigation Bar (Active on Mobile/Narrow Screens) -->
+    <nav class="mobile-bottom-nav">
+      <button class="nav-item active" data-tab="admin" id="mobile-nav-admin">
+        <span class="nav-icon">🗂</span>
+        <span class="nav-label">Questions</span>
+      </button>
+      <button class="nav-item" data-tab="papers" id="mobile-nav-papers">
+        <span class="nav-icon">📄</span>
+        <span class="nav-label">Papers</span>
+      </button>
+      <button class="nav-item" data-tab="answers" id="mobile-nav-answers">
+        <span class="nav-icon">🔑</span>
+        <span class="nav-label">Keys</span>
+      </button>
+      <button class="nav-item" data-tab="grading" id="mobile-nav-grading">
+        <span class="nav-icon">✏️</span>
+        <span class="nav-label">Grading</span>
+      </button>
+      <button class="nav-item" data-tab="results" id="mobile-nav-results">
+        <span class="nav-icon">📊</span>
+        <span class="nav-label">Results</span>
+      </button>
+    </nav>
+  </div>
+
+  <!-- Modal: Add / Edit Question (Airy Ergonomic Design) -->
+  <div class="modal-backdrop hidden" id="modal-backdrop">
+    <div class="modal modal-relaxed" id="modal-question">
+      <div class="modal-header">
+        <div style="display:flex;align-items:center;gap:0.75rem">
+          <span style="font-size:1.35rem">✏️</span>
+          <div>
+            <h2 class="modal-title" id="modal-title">Add Question</h2>
+            <div style="font-size:0.75rem;color:var(--text-muted);margin-top:0.15rem">Configure question content, classification, and answer key</div>
+          </div>
+        </div>
+        <button class="modal-close" id="modal-close">✕</button>
+      </div>
+      <div class="modal-body" style="padding:1.6rem 2rem">
+        <form id="question-form" autocomplete="off" class="relaxed-form">
+          
+          <!-- Question Format Toggle -->
+          <div>
+            <label class="input-label" style="margin-bottom:0.4rem">Question Format</label>
+            <div class="format-toggle-group" style="max-width:440px">
+              <button type="button" class="format-toggle-btn active" id="q-toggle-objective" data-qtype="objective">
+                <span>🔘 Objective (MCQ)</span>
+              </button>
+              <button type="button" class="format-toggle-btn" id="q-toggle-subjective" data-qtype="subjective">
+                <span>📝 Subjective (Descriptive)</span>
+              </button>
+            </div>
+            <input type="hidden" id="f-question-type" value="objective" />
+          </div>
+
+          <!-- Metadata & Classification Card -->
+          <div class="question-meta-card">
+            <div class="meta-card-title">
+              <span>🏷️</span> Metadata & Classification
+            </div>
+            <div class="meta-card-grid-top">
+              <div class="input-group">
+                <label class="input-label">Target Pool <span class="required">*</span></label>
+                <select id="f-pool" class="input-field">
+                  <option value="1">Pool 1</option>
+                  <option value="2">Pool 2</option>
+                  <option value="3">Pool 3</option>
+                  <option value="4">Pool 4</option>
+                  <option value="5">Pool 5</option>
+                </select>
+              </div>
+              <div class="input-group">
+                <label class="input-label">Topic / Unit</label>
+                <input type="text" id="f-topic" class="input-field" placeholder="e.g. Lexical Analysis" />
+              </div>
+              <div class="input-group">
+                <label class="input-label">Marks <span class="required">*</span></label>
+                <input type="number" id="f-marks" class="input-field" min="1" max="100" value="2" />
+              </div>
+            </div>
+            <div class="meta-card-grid-bottom">
+              <div class="input-group">
+                <label class="input-label">Bloom's Difficulty</label>
+                <select id="f-difficulty" class="input-field">
+                  <option value="EASY">Easy</option>
+                  <option value="MEDIUM" selected>Medium</option>
+                  <option value="HARD">Hard</option>
+                </select>
+              </div>
+              <div class="input-group">
+                <label class="input-label">Course Outcome (CO)</label>
+                <input type="text" id="f-co-tag" class="input-field input-mono" placeholder="e.g. CO1, CO2" maxlength="12" />
+              </div>
+            </div>
+          </div>
+
+          <!-- Question Statement -->
+          <div class="input-group">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.3rem">
+              <label class="input-label" style="margin:0">Question Text <span class="required">*</span></label>
+              <span style="font-size:0.75rem;color:var(--text-muted)">Supports LaTeX math (e.g. <code>$x^2$</code>, <code>\texttt{...}</code>)</span>
+            </div>
+            <textarea id="f-text" class="input-field textarea question-textarea" rows="4" placeholder="Enter the complete question statement…"></textarea>
+          </div>
+
+          <!-- MCQ Options Section -->
+          <div id="mcq-options-container" class="relaxed-options-section">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.4rem">
+              <label class="input-label" style="margin:0;font-size:0.88rem">Options & Correct Answer <span class="required">*</span></label>
+              <span style="font-size:0.75rem;color:var(--text-muted)">Click "Correct" beside an option to set the answer key</span>
+            </div>
+
+            <div class="options-relaxed-list">
+              <!-- Option A -->
+              <div class="option-row" id="opt-row-a">
+                <div class="opt-badge">A</div>
+                <input type="text" id="f-opt-a" class="input-field opt-input" placeholder="Enter statement for Option A…" />
+                <label class="opt-correct-label" title="Mark Option A as correct answer">
+                  <input type="radio" name="opt-correct-radio" class="opt-radio" data-opt="a" value="a" />
+                  <span class="opt-radio-text">Correct</span>
+                </label>
+              </div>
+
+              <!-- Option B -->
+              <div class="option-row" id="opt-row-b">
+                <div class="opt-badge">B</div>
+                <input type="text" id="f-opt-b" class="input-field opt-input" placeholder="Enter statement for Option B…" />
+                <label class="opt-correct-label" title="Mark Option B as correct answer">
+                  <input type="radio" name="opt-correct-radio" class="opt-radio" data-opt="b" value="b" />
+                  <span class="opt-radio-text">Correct</span>
+                </label>
+              </div>
+
+              <!-- Option C -->
+              <div class="option-row" id="opt-row-c">
+                <div class="opt-badge">C</div>
+                <input type="text" id="f-opt-c" class="input-field opt-input" placeholder="Enter statement for Option C…" />
+                <label class="opt-correct-label" title="Mark Option C as correct answer">
+                  <input type="radio" name="opt-correct-radio" class="opt-radio" data-opt="c" value="c" />
+                  <span class="opt-radio-text">Correct</span>
+                </label>
+              </div>
+
+              <!-- Option D -->
+              <div class="option-row" id="opt-row-d">
+                <div class="opt-badge">D</div>
+                <input type="text" id="f-opt-d" class="input-field opt-input" placeholder="Enter statement for Option D…" />
+                <label class="opt-correct-label" title="Mark Option D as correct answer">
+                  <input type="radio" name="opt-correct-radio" class="opt-radio" data-opt="d" value="d" />
+                  <span class="opt-radio-text">Correct</span>
+                </label>
+              </div>
+            </div>
+
+            <!-- Synchronized Select (Preserved for compatibility) -->
+            <select id="f-correct" class="hidden">
+              <option value="">— select correct option —</option>
+              <option value="a">Option A</option>
+              <option value="b">Option B</option>
+              <option value="c">Option C</option>
+              <option value="d">Option D</option>
+            </select>
+          </div>
+
+          <div id="form-error" class="error-msg hidden"></div>
+        </form>
+      </div>
+      <div class="modal-footer" style="padding:1.2rem 2rem">
+        <button class="btn btn-ghost" id="btn-cancel">Cancel</button>
+        <button class="btn btn-primary" id="btn-save-question" style="min-width:140px">Save Question</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: View Paper -->
+  <div class="modal-backdrop hidden" id="modal-paper-view-backdrop">
+    <div class="modal modal-lg" id="modal-paper-view">
+      <div class="modal-header">
+        <div>
+          <h2 class="modal-title" id="paper-view-title">Paper Preview</h2>
+          <span class="mono" id="paper-view-uid" style="font-size:0.82rem;color:var(--accent-cyan)"></span>
+        </div>
+        <div style="display:flex;gap:0.5rem;align-items:center">
+          <a class="btn btn-ghost btn-sm" id="paper-view-pdf-tab" href="#" target="_blank">↗ Open PDF</a>
+          <a class="btn btn-ghost btn-sm" id="paper-view-pdf-dl" href="#" download>⬇ PDF</a>
+          <a class="btn btn-ghost btn-sm" id="paper-view-tex-dl" href="#" download>⬇ LaTeX</a>
+          <button class="modal-close" id="modal-paper-view-close">✕</button>
+        </div>
+      </div>
+      <div style="display:flex;align-items:center;gap:0.5rem;padding:0.6rem 1.25rem;background:var(--bg-surface-high);border-bottom:1px solid var(--glass-border)">
+        <button type="button" class="btn btn-sm btn-primary" id="btn-paper-toggle-html">📄 Document View</button>
+        <button type="button" class="btn btn-sm btn-ghost" id="btn-paper-toggle-pdf">📑 Live PDF Viewer</button>
+      </div>
+      <div class="modal-body paper-preview-body" id="paper-preview-content">
+        <div class="loading-state">Loading paper preview…</div>
+      </div>
+      <div class="modal-body hidden" id="paper-preview-pdf-wrap" style="padding:0;height:70vh">
+        <iframe id="paper-preview-iframe" src="" style="width:100%;height:100%;border:none;background:var(--bg-base)"></iframe>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-ghost" id="btn-close-paper-view">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: View Solution Sheet & Answer Key -->
+  <div class="modal-backdrop hidden" id="modal-solution-backdrop">
+    <div class="modal modal-lg" id="modal-solution">
+      <div class="modal-header">
+        <div>
+          <h2 class="modal-title">Paper Solution Key</h2>
+          <span class="mono" id="solution-modal-uid" style="font-size:0.82rem;color:var(--accent-cyan)"></span>
+        </div>
+        <button class="modal-close" id="modal-solution-close">✕</button>
+      </div>
+      <div class="modal-body" id="solution-modal-content" style="max-height:75vh;overflow-y:auto">
+        <div class="loading-state">Loading solution sheet…</div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-ghost" id="btn-close-solution-modal">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Clear Question Bank -->
+  <div class="modal-backdrop hidden" id="modal-clear-bank-backdrop">
+    <div class="modal modal-md" id="modal-clear-bank">
+      <div class="modal-header">
+        <div>
+          <h2 class="modal-title" style="color:var(--accent-red)">Clear Question Bank</h2>
+          <span style="font-size:0.8rem;color:var(--text-secondary)">Permanently remove questions from the database</span>
+        </div>
+        <button class="modal-close" id="modal-clear-bank-close">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="danger-banner" style="margin-bottom:1rem">
+          <strong>⚠️ Warning:</strong> This operation will permanently delete questions from your active question bank repository. Generated paper snapshots and grading records will remain intact.
+        </div>
+
+        <div class="input-group" style="margin-bottom:1rem">
+          <label class="input-label">Select Scope to Clear</label>
+          <select id="clear-scope-select" class="input-field">
+            <option value="all">Entire Question Bank (All Pools)</option>
+            <option value="1">Pool 1 only</option>
+            <option value="2">Pool 2 only</option>
+            <option value="3">Pool 3 only</option>
+            <option value="4">Pool 4 only</option>
+            <option value="5">Pool 5 only</option>
+          </select>
+        </div>
+
+        <div style="margin-bottom:1rem">
+          <label class="checkbox-label" style="align-items:flex-start">
+            <input type="checkbox" id="confirm-clear-checkbox" style="margin-top:0.2rem" />
+            <span style="font-size:0.84rem;color:var(--text-secondary)">
+              I understand that this action is irreversible and will permanently delete the selected questions.
+            </span>
+          </label>
+        </div>
+
+        <div id="clear-error" class="error-msg hidden"></div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-ghost" id="btn-cancel-clear">Cancel</button>
+        <button class="btn btn-danger" id="btn-confirm-clear" disabled style="opacity:0.5;cursor:not-allowed">
+          <span>🗑️</span> Yes, Clear Questions
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Create New Question Bank -->
+  <div class="modal-backdrop hidden" id="modal-bank-backdrop">
+    <div class="modal modal-md" id="modal-bank">
+      <div class="modal-header">
+        <div>
+          <h2 class="modal-title">Create Question Bank</h2>
+          <span style="font-size:0.8rem;color:var(--text-secondary)">Create an isolated bank with its own pools, papers, and results</span>
+        </div>
+        <button class="modal-close" id="modal-bank-close">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-row">
+          <div class="input-group flex-3">
+            <label class="input-label">Bank / Instance Name <span class="required">*</span></label>
+            <input type="text" id="new-bank-name" class="input-field" placeholder="e.g. Compiler Design - Quiz 2" />
+          </div>
+          <div class="input-group flex-2">
+            <label class="input-label">Paper Code Prefix <span class="required">*</span></label>
+            <input type="text" id="new-bank-code" class="input-field input-mono" placeholder="e.g. CD2" maxlength="10" />
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="input-group flex-3">
+            <label class="input-label">Subject Name</label>
+            <input type="text" id="new-bank-subject" class="input-field" placeholder="e.g. Compiler Design" value="Compiler Design" />
+          </div>
+          <div class="input-group flex-2">
+            <label class="input-label">Course Code</label>
+            <input type="text" id="new-bank-course" class="input-field" placeholder="e.g. NCSC302" value="NCSC302" />
+          </div>
+        </div>
+        <div class="input-group">
+          <label class="input-label">Initial Number of Pools <span class="required">*</span></label>
+          <input type="number" id="new-bank-pools" class="input-field" min="1" max="50" value="5" />
+          <span class="input-hint">You can add, rename, or delete pools at any time later.</span>
+        </div>
+        <div id="new-bank-error" class="error-msg hidden"></div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-ghost" id="btn-cancel-bank">Cancel</button>
+        <button class="btn btn-primary" id="btn-save-bank">Create Bank</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Master LaTeX Import Options -->
+  <div class="modal-backdrop hidden" id="modal-latex-import-backdrop">
+    <div class="modal modal-md" id="modal-latex-import">
+      <div class="modal-header">
+        <div>
+          <h2 class="modal-title">Import Master LaTeX</h2>
+          <span id="latex-import-filename" class="mono" style="font-size:0.8rem;color:var(--accent-cyan)"></span>
+        </div>
+        <button class="modal-close" id="modal-latex-import-close">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="flex-between info-banner" style="margin-bottom:0.85rem">
+          <span style="font-size:0.8rem;color:#166534">Need the standard question format?</span>
+          <a href="/api/questions/template/latex" download="master_questions_template.tex" class="btn btn-ghost" style="padding:0.25rem 0.5rem;font-size:0.75rem;height:auto">⬇ Download Template</a>
+        </div>
+        <div class="input-group">
+          <label class="input-label">How should imported questions be distributed into pools?</label>
+          <div style="display:flex;flex-direction:column;gap:0.65rem;margin-top:0.35rem">
+            <label class="checkbox-label" style="align-items:flex-start;cursor:pointer">
+              <input type="radio" name="latex-pool-mode" id="latex-mode-existing" value="existing" checked style="margin-top:0.2rem" />
+              <div>
+                <div style="font-weight:600;font-size:0.88rem">Distribute across selected existing pools</div>
+                <div style="font-size:0.78rem;color:var(--text-muted)">Shuffle and split evenly across the checked pools below</div>
+              </div>
+            </label>
+            <div id="latex-existing-pools-wrap" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:0.4rem;padding:0.6rem;background:var(--bg-surface-high);border:1px solid var(--glass-border);border-radius:var(--radius-sm);margin-left:1.4rem">
+              <!-- Populated dynamically -->
+            </div>
+
+            <label class="checkbox-label" style="align-items:flex-start;cursor:pointer;margin-top:0.25rem">
+              <input type="radio" name="latex-pool-mode" id="latex-mode-new" value="new" style="margin-top:0.2rem" />
+              <div>
+                <div style="font-weight:600;font-size:0.88rem">Create new pools and distribute evenly</div>
+                <div style="font-size:0.78rem;color:var(--text-muted)">Append new pools to this bank and split questions across them</div>
+              </div>
+            </label>
+            <div id="latex-new-pools-wrap" class="hidden" style="margin-left:1.4rem;display:flex;align-items:center;gap:0.6rem">
+              <label class="input-label" style="margin:0;white-space:nowrap">Number of new pools:</label>
+              <input type="number" id="latex-new-pools-count" class="input-field" min="1" max="50" value="5" style="max-width:110px" />
+            </div>
+
+            <div style="margin-top:0.75rem;padding-top:0.65rem;border-top:1px solid var(--glass-border)">
+              <label class="input-label">If a question already exists in this bank:</label>
+              <div style="display:flex;gap:1.25rem;margin-top:0.35rem">
+                <label class="checkbox-label" style="font-size:0.82rem;cursor:pointer">
+                  <input type="radio" name="latex-dup-action" id="latex-dup-skip" value="skip" checked />
+                  <span>Skip existing</span>
+                </label>
+                <label class="checkbox-label" style="font-size:0.82rem;cursor:pointer">
+                  <input type="radio" name="latex-dup-action" id="latex-dup-overwrite" value="overwrite" />
+                  <span>Overwrite & update</span>
+                </label>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-ghost" id="btn-cancel-latex-import">Cancel</button>
+        <button class="btn btn-primary" id="btn-confirm-latex-import">🔍 Preview & Review</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: How Paper Generation Works -->
+  <div class="modal-backdrop hidden" id="modal-how-it-works-backdrop">
+    <div class="modal modal-md" id="modal-how-it-works" style="max-width:540px">
+      <div class="modal-header">
+        <div>
+          <h2 class="modal-title" style="display:flex;align-items:center;gap:0.5rem">
+            <span>ℹ️</span> How Paper Generation Works
+          </h2>
+          <span style="font-size:0.8rem;color:var(--text-muted);margin-top:0.15rem;display:block">Algorithmic workflow for creating non-conflicting exam sets</span>
+        </div>
+        <button class="modal-close" id="modal-how-it-works-close">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="info-steps" style="gap:1.1rem">
+          <div class="info-step">
+            <div class="step-num">1</div>
+            <div class="step-text"><strong style="color:var(--text-primary)">Weighted Pool Balance:</strong> Questions are drawn evenly across your selected topic pools. The generator prioritizes least-used questions first to ensure even question coverage and zero internal duplicates per set.</div>
+          </div>
+          <div class="info-step">
+            <div class="step-num">2</div>
+            <div class="step-text"><strong style="color:var(--text-primary)">Independent Randomization:</strong> The question order is shuffled for each paper. For objective (MCQ) quizzes, all ABCD choices within every question are independently scrambled.</div>
+          </div>
+          <div class="info-step">
+            <div class="step-num">3</div>
+            <div class="step-text"><strong style="color:var(--text-primary)">Unique Paper UID:</strong> A distinct paper tracking code (e.g. <code>CD-2026-1</code>) is stamped on each student sheet and embedded into the Master Answer Key index.</div>
+          </div>
+          <div class="info-step">
+            <div class="step-num">4</div>
+            <div class="step-text"><strong style="color:var(--text-primary)">Rapid TA Evaluation:</strong> Post-exam, TAs grade student responses instantly via the Rapid Numpad grading screen or through batch Excel answer uploads.</div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-primary" id="btn-close-how-it-works">Got it</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Interactive Import Dry-Run & Staging Preview -->
+  <div class="modal-backdrop hidden" id="modal-import-preview-backdrop">
+    <div class="modal modal-lg" id="modal-import-preview" style="max-width:920px;max-height:92vh">
+      <div class="modal-header">
+        <div>
+          <h2 class="modal-title" style="display:flex;align-items:center;gap:0.5rem">
+            <span>🔍</span> Import Staging & Verification
+          </h2>
+          <div style="font-size:0.8rem;color:var(--text-muted);margin-top:0.2rem">
+            Review parsed questions, pool distributions, and OBE tags before writing to the database
+          </div>
+        </div>
+        <button class="modal-close" id="modal-import-preview-close">✕</button>
+      </div>
+      <div class="modal-body" style="gap:1rem">
+        <!-- Summary Stats Badges -->
+        <div style="display:flex;gap:0.6rem;flex-wrap:wrap;align-items:center" id="preview-stat-chips">
+          <!-- Populated dynamically -->
+        </div>
+
+        <!-- Warning / Missing Answers Banner -->
+        <div id="preview-warnings-box" class="hidden error-msg" style="white-space:pre-wrap;font-size:0.82rem"></div>
+
+        <!-- Controls: Duplicate Handling Selection -->
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap;padding:0.75rem 1rem;background:var(--bg-surface-high);border-radius:var(--radius-md);border:1px solid var(--glass-border)">
+          <div style="display:flex;align-items:center;gap:0.75rem">
+            <span style="font-size:0.82rem;font-weight:700;color:var(--text-secondary)">Duplicate Handling:</span>
+            <select id="preview-duplicate-mode" class="input-field" style="height:36px;padding:0.2rem 0.6rem;font-size:0.82rem;width:auto">
+              <option value="skip">Skip Existing (Safe, keep current questions)</option>
+              <option value="overwrite">Overwrite Existing (Update options, answer keys & OBE tags)</option>
+            </select>
+          </div>
+          <span id="preview-count-label" style="font-size:0.82rem;color:var(--text-muted);font-weight:600"></span>
+        </div>
+
+        <!-- Staging Question List -->
+        <div style="max-height:48vh;overflow-y:auto;display:flex;flex-direction:column;gap:0.65rem;padding-right:0.25rem" id="preview-question-list">
+          <!-- Populated dynamically -->
+        </div>
+      </div>
+      <div class="modal-footer" style="justify-content:space-between">
+        <button class="btn btn-ghost" id="btn-cancel-import-preview">Discard & Cancel</button>
+        <button class="btn btn-primary" id="btn-confirm-import-staging">
+          <span>✓</span> Confirm & Ingest Questions
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div class="toast-container" id="toast-container"></div>
+
+  <script src="/static/js/theme.js?v=5.5"></script>
+  <script src="/static/js/app.js?v=5.5"></script>
+  <script src="/static/js/admin.js?v=5.5"></script>
+  <script src="/static/js/banks.js?v=5.5"></script>
+  <script src="/static/js/pools.js?v=5.5"></script>
+  <script src="/static/js/questions.js?v=5.5"></script>
+  <script src="/static/js/generator.js?v=5.5"></script>
+  <script src="/static/js/papers.js?v=5.5"></script>
+  <script src="/static/js/answers.js?v=5.5"></script>
+  <script src="/static/js/grading.js?v=5.5"></script>
+  <script src="/static/js/results.js?v=5.5"></script>
+</body>
+</html>

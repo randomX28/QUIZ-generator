@@ -1,0 +1,110 @@
+\documentclass[12pt,a4paper]{article}
+\usepackage[top=1.1cm, bottom=1.1cm, left=1.3cm, right=1.3cm]{geometry}
+\usepackage{amsmath, amssymb}
+\usepackage{tabularx}
+\usepackage{array}
+\usepackage{graphicx}
+\usepackage{listings}
+
+\lstdefinestyle{code}{
+  basicstyle=\ttfamily\scriptsize,
+  frame=single,
+  breaklines=true,
+  columns=fullflexible,
+  keepspaces=true,
+  aboveskip=2.5pt,
+  belowskip=2.5pt,
+  xleftmargin=0.6em
+}
+\lstset{style=code}
+
+\setlength{\parindent}{0pt}
+\pagestyle{empty}
+
+\begin{document}
+\footnotesize
+
+<% for paper in papers %>
+\IfFileExists{iit_logo.png}{%
+\noindent
+\begin{minipage}[c]{0.13\textwidth}
+  \includegraphics[width=\linewidth]{iit_logo.png}
+\end{minipage}%
+\begin{minipage}[c]{0.71\textwidth}
+  \centering
+  {\large \textbf{Indian Institute of Technology (ISM), Dhanbad}}\\[2pt]
+  {\normalsize Department of Computer Science and Engineering}\\[3pt]
+  {\normalsize \textbf{<< paper.subject_name | tex_escape >> (<< paper.course_code | tex_escape >>)}}\\[2pt]
+  {\normalsize \textbf{<< paper.exam_title | tex_escape >>}}
+\end{minipage}%
+\begin{minipage}[c]{0.16\textwidth}
+  \raggedleft
+  \fbox{\parbox{0.92\linewidth}{\centering \scriptsize \textbf{Paper Code} \\[2pt] \textbf{\texttt{<< paper.uid >>}}}}
+\end{minipage}%
+}{%
+\noindent
+\begin{minipage}[c]{0.82\textwidth}
+  \centering
+  {\large \textbf{Indian Institute of Technology (ISM), Dhanbad}}\\[2pt]
+  {\normalsize Department of Computer Science and Engineering}\\[3pt]
+  {\normalsize \textbf{<< paper.subject_name | tex_escape >> (<< paper.course_code | tex_escape >>)}}\\[2pt]
+  {\normalsize \textbf{<< paper.exam_title | tex_escape >>}}
+\end{minipage}%
+\begin{minipage}[c]{0.18\textwidth}
+  \raggedleft
+  \fbox{\parbox{0.92\linewidth}{\centering \scriptsize \textbf{Paper Code} \\[2pt] \textbf{\texttt{<< paper.uid >>}}}}
+\end{minipage}%
+}
+
+\vspace{4pt}
+\hrule height 0.6pt
+\vspace{2.5pt}
+\noindent
+\textbf{Date:} << paper.exam_date | tex_escape >> \hfill \textbf{Duration:} << paper.duration | tex_escape >> \hfill \textbf{Max. Marks:} << paper.max_marks | tex_escape >>
+\vspace{2.5pt}
+\hrule height 0.6pt
+
+\vspace{5pt}
+\noindent
+\textbf{Name:} \hrulefill \hspace{1.5cm} \textbf{Admission No.:} \hrulefill
+
+\vspace{4pt}
+\noindent
+{\small \textbf{Instructions:} << paper.instructions | tex_escape >>}
+\vspace{2.5pt}
+\hrule height 0.4pt
+
+<% for q in paper.questions %>
+\vspace{0.16cm}
+<% set qm = q.marks if (q.marks is defined and q.marks is not none and q.marks != '') else (paper.marks_per_question if paper.marks_per_question else (10 if paper.paper_type == 'subjective' else 2)) %>
+<% set qm_str = qm | string %>
+<% set qm_display = qm_str if ('mark' in qm_str|lower) else (qm_str ~ (' Mark' if qm_str == '1' else ' Marks')) %>
+\noindent \textbf{<< loop.index >>.} << q.text >> \hfill \textbf{[<< qm_display | tex_escape >>]}
+
+<% if paper.paper_type != 'subjective' and q.shuffled_options and q.shuffled_options.a %>
+\vspace{0.04cm}
+\noindent
+\begin{tabularx}{\textwidth}{@{}X X@{}}
+(a) << q.shuffled_options.a >> & (b) << q.shuffled_options.b >> \\[2.5pt]
+(c) << q.shuffled_options.c >> & (d) << q.shuffled_options.d >> \\
+\end{tabularx}
+<% else %>
+\vspace{0.25cm}
+<% endif %>
+
+<% endfor %>
+
+\vspace{0.1cm}
+\noindent\rule{\textwidth}{0.5pt}
+
+\vspace{0.3cm}
+\begin{center}
+\textit{--- End of Paper ---} \quad {\scriptsize \texttt{<< paper.uid >>}} 
+\end{center}
+
+<% if not loop.last %>
+\clearpage
+<% endif %>
+<% endfor %>
+
+\end{document}

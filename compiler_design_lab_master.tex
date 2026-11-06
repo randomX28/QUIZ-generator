@@ -1,0 +1,770 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage[top=1.6cm, bottom=1.6cm, left=1.6cm, right=1.6cm]{geometry}
+\usepackage{amsmath, amssymb}
+\usepackage{tabularx}
+\usepackage{array}
+\usepackage{listings}
+
+\setlength{\parindent}{0pt}
+\pagestyle{plain}
+
+\lstdefinestyle{code}{
+  basicstyle=\ttfamily\footnotesize,
+  frame=single,
+  breaklines=true,
+  columns=fullflexible,
+  keepspaces=true,
+  aboveskip=4pt,
+  belowskip=4pt,
+  xleftmargin=0.8em
+}
+\lstset{style=code}
+
+\begin{document}
+\footnotesize
+
+\begin{center}
+{\large \textbf{Indian Institute of Technology (Indian School of Mines), Dhanbad}}\\[2.5pt]
+{\normalsize \textbf{Department of Computer Science and Engineering}}\\[2.5pt]
+{\normalsize \textbf{Compiler Design Lab (Course Code: NCSC302 / Lab)}}\\[3pt]
+{\large \textbf{MASTER QUESTION PAPER}}\\[2pt]
+\textit{Complete Question Bank Repository --- (No Marked Answers)}\\[4pt]
+\end{center}
+
+\noindent
+\begin{tabular*}{\textwidth}{@{\extracolsep{\fill}}lll}
+\textbf{Subject:} Compiler Design Lab & \textbf{Course Code:} NCSC302 & \textbf{Date:} 05-Nov-2026 \\
+\textbf{Total Questions:} 45 & \textbf{Format:} Multiple Choice & \textbf{Document:} Master Question Paper \\
+\end{tabular*}
+
+\vspace{0.2cm}
+\noindent\textbf{General Instructions:}
+\begin{enumerate}\setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}
+\item This master paper contains the complete archive of all \textbf{45 lab questions} across three core units: C Programming / Algorithms (Q1--Q15), Lex (Q16--Q30), and Yacc (Q31--Q45).
+\item For each objective multiple-choice question, exactly four choices are provided: \textbf{(a)}, \textbf{(b)}, \textbf{(c)}, and \textbf{(d)}.
+\item \textbf{No answer choices are marked or highlighted in this paper.} It serves as a master reference for examination planning, student practice, and test paper assembly.
+\item Unless stated otherwise, reference grammar $G_1$ refers to:
+  $E \rightarrow TE',\; E' \rightarrow +TE' \mid \epsilon,\; T \rightarrow FT',\; T' \rightarrow *FT' \mid \epsilon,\; F \rightarrow (E) \mid id$.
+\item Marks for each question are displayed in the right margin.
+\end{enumerate}
+
+\vspace{0.1cm}
+\noindent\rule{\textwidth}{0.6pt}
+\vspace{0.2cm}
+
+%======================================================================
+% SECTION A: C PROGRAMMING / COMPILER ALGORITHMS IN C (Q1 - Q15)
+%======================================================================
+
+\noindent \textbf{1.} Consider the following three-address code. How many basic blocks does it contain? \hfill \textbf{[2 Marks]}
+\begin{lstlisting}
+(1) i = 1
+(2) if i > 10 goto (7)
+(3) t1 = i * 2
+(4) a = a + t1
+(5) i = i + 1
+(6) goto (2)
+(7) x = a
+\end{lstlisting}
+% ans: B
+\vspace{0.06cm}
+\noindent
+\begin{tabularx}{\textwidth}{@{}X X@{}}
+(a) 3 & (b) 4 \\[3pt]
+(c) 5 & (d) 7 \\
+\end{tabularx}
+
+\vspace{0.22cm}
+
+\noindent \textbf{2.} Applying the standard algorithm for eliminating immediate left recursion ($A \rightarrow A\alpha \mid \beta$ becomes $A \rightarrow \beta A'$, $A' \rightarrow \alpha A' \mid \epsilon$) to the production $E \rightarrow E + T \mid T$ gives: \hfill \textbf{[2 Marks]}
+% ans: C
+\vspace{0.06cm}
+\noindent
+\begin{tabularx}{\textwidth}{@{}X X@{}}
+(a) $E \rightarrow +TE' \mid T$ & (b) $E \rightarrow TE'$, \quad $E' \rightarrow E'+T \mid \epsilon$ \\[3pt]
+(c) $E \rightarrow TE'$, \quad $E' \rightarrow +TE' \mid \epsilon$ & (d) $E \rightarrow E'T$, \quad $E' \rightarrow +E' \mid \epsilon$ \\
+\end{tabularx}
+
+\vspace{0.22cm}
+
+\noindent \textbf{3.} The following C fragment prints the transformed productions of $A \rightarrow A\alpha \mid \beta$ (here \texttt{\#} denotes $\epsilon$). Choose the option that fills the blank so that the second line prints $A' \rightarrow \alpha A' \mid \epsilon$. \hfill \textbf{[2 Marks]}
+\begin{lstlisting}
+char A, alpha[10], beta[10];
+/* Production: A -> A alpha | beta */
+printf("%c -> %s%c'\n", A, beta, A);
+printf("%c' -> %s%c'|#\n", A, alpha, ______);
+\end{lstlisting}
+% ans: A
+\vspace{0.06cm}
+\noindent
+\begin{tabularx}{\textwidth}{@{}X X@{}}
+(a) \texttt{A} & (b) \texttt{alpha} \\[3pt]
+(c) \texttt{beta} & (d) \texttt{'\#'} \\
+\end{tabularx}
+
+\vspace{0.22cm}
+
+\noindent \textbf{4.} For the grammar $S \rightarrow Aa \mid b$, \quad $A \rightarrow Sc \mid d$, indirect left recursion is removed by first substituting the productions of $S$ into $A \rightarrow Sc$. The productions of $A$ then become: \hfill \textbf{[2 Marks]}
+% ans: D
+\vspace{0.06cm}
+\noindent
+\begin{tabularx}{\textwidth}{@{}X X@{}}
+(a) $A \rightarrow Aa \mid b \mid d$ & (b) $A \rightarrow Acc \mid bc \mid d$ \\[3pt]
+(c) $A \rightarrow aAc \mid bc \mid d$ & (d) $A \rightarrow Aac \mid bc \mid d$ \\
+\end{tabularx}
+
+\vspace{0.22cm}
+
+\noindent \textbf{5.} For grammar $G_1$, $\text{FIRST}(T')$ is: \hfill \textbf{[2 Marks]}
+% ans: B
+\vspace{0.06cm}
+\noindent
+\begin{tabularx}{\textwidth}{@{}X X@{}}
+(a) $\{+, \epsilon\}$ & (b) $\{*, \epsilon\}$ \\[3pt]
+(c) $\{(, id\}$ & (d) $\{*, +\}$ \\
+\end{tabularx}
+
+\vspace{0.22cm}
+
+\noindent \textbf{6.} For grammar $G_1$, $\text{FOLLOW}(T)$ is: \hfill \textbf{[2 Marks]}
+% ans: C
+\vspace{0.06cm}
+\noindent
+\begin{tabularx}{\textwidth}{@{}X X@{}}
+(a) $\{+, \$\}$ & (b) $\{*, +, ), \$\}$ \\[3pt]
+(c) $\{+, ), \$\}$ & (d) $\{), \$\}$ \\
+\end{tabularx}
+
+\vspace{0.22cm}
+
+\noindent \textbf{7.} A student writes the following code for the non-terminal case of a non-recursive LL(1) predictive parser. The parser produces wrong derivations (the leftmost symbol of the right-hand side is matched last). What is the correct fix? \hfill \textbf{[2 Marks]}
+\begin{lstlisting}
+else {                       /* X is a non-terminal */
+    p = M[X][a];             /* production number from parsing table */
+    top--;                   /* pop X */
+    for (k = 0; k < len[p]; k++)
+        stack[++top] = rhs[p][k];   /* push RHS */
+}
+\end{lstlisting}
+% ans: A
+\vspace{0.06cm}
+\noindent
+\begin{tabularx}{\textwidth}{@{}X X@{}}
+(a) Push the right-hand side in reverse order (loop from \texttt{len[p]-1} down to \texttt{0}) & (b) Do not pop $X$ before pushing the right-hand side \\[3pt]
+(c) Push $X$ back onto the stack after the right-hand side & (d) Replace the stack by a queue \\
+\end{tabularx}
+
+\vspace{0.22cm}
+
+\noindent \textbf{8.} Using grammar $G_1$, an LL(1) parser is parsing \texttt{id + id * id}. At some moment the configuration (top of stack is at the \emph{left}) is: \hfill \textbf{[2 Marks]}
+\begin{lstlisting}
+STACK:  F T' E' $
+INPUT:  id + id * id $
+\end{lstlisting}
+What is the next parser action?
+% ans: D
+\vspace{0.06cm}
+\noindent
+\begin{tabularx}{\textwidth}{@{}X X@{}}
+(a) Match \texttt{id} & (b) Output $T' \rightarrow *FT'$ \\[3pt]
+(c) Report an error & (d) Output $F \rightarrow id$ \\
+\end{tabularx}
+
+\vspace{0.22cm}
+
+\noindent \textbf{9.} Using grammar $G_1$ and panic-mode error recovery, the parser is given the input \texttt{id + * id \$}. After matching \texttt{id} and \texttt{+}, the stack is \texttt{T E' \$} and the lookahead is \texttt{*}, where $M[T,*]$ is empty and $*\notin \text{FOLLOW}(T)$. What does the parser do? \hfill \textbf{[2 Marks]}
+% ans: B
+\vspace{0.06cm}
+\noindent
+\begin{tabularx}{\textwidth}{@{}X X@{}}
+(a) Pops $T$ and continues & (b) Skips the input symbol \texttt{*} and continues with $T$ on top of the stack \\[3pt]
+(c) Halts immediately & (d) Inserts \texttt{id} in the input \\
+\end{tabularx}
+
+\vspace{0.22cm}
+
+\noindent \textbf{10.} In an operator-precedence parser for $G_1$ terminals, the topmost terminal on the stack is \texttt{+} and the incoming input terminal is \texttt{*}. The relation between them and the resulting action are: \hfill \textbf{[2 Marks]}
+% ans: C
+\vspace{0.06cm}
+\noindent
+\begin{tabularx}{\textwidth}{@{}X X@{}}
+(a) $+ \mathrel{\cdot\!>} *$, reduce & (b) $+ \doteq *$, shift \\[3pt]
+(c) $+ \mathrel{<\!\cdot} *$, shift & (d) no relation, error \\
+\end{tabularx}
+
+\vspace{0.22cm}
+
+\noindent \textbf{11.} For the augmented grammar $S' \rightarrow S$, \quad $S \rightarrow AA$, \quad $A \rightarrow aA \mid b$, how many items are there in $\text{closure}(\{S' \rightarrow \cdot S\})$? \hfill \textbf{[2 Marks]}
+% ans: A
+\vspace{0.06cm}
+\noindent
+\begin{tabularx}{\textwidth}{@{}X X@{}}
+(a) 4 & (b) 2 \\[3pt]
+(c) 3 & (d) 5 \\
+\end{tabularx}
+
+\vspace{0.22cm}
+
+\noindent \textbf{12.} The pseudo-C code below computes $\text{closure}(I)$ for LR(0) items. Choose the condition that correctly fills the blank. \hfill \textbf{[2 Marks]}
+\begin{lstlisting}
+do {
+    changed = 0;
+    for each item  A -> alpha . B beta  in I
+        for each production  B -> gamma
+            if ( ______ ) {
+                add  B -> . gamma  to I;
+                changed = 1;
+            }
+} while (changed);
+\end{lstlisting}
+% ans: D
+\vspace{0.06cm}
+\noindent
+\begin{tabularx}{\textwidth}{@{}X X@{}}
+(a) $B$ is a terminal & (b) $A \rightarrow \alpha \cdot B\beta$ is already in $I$ \\[3pt]
+(c) $\gamma$ is empty & (d) $B \rightarrow \cdot\gamma$ is not already in $I$ \\
+\end{tabularx}
+
+\vspace{0.22cm}
+
+\noindent \textbf{13.} The expression $(a+b)*(c-d) + (a+b)*(c-d)$ is represented as a DAG with common subexpressions shared. How many nodes does the DAG have (leaves included)? \hfill \textbf{[2 Marks]}
+% ans: B
+\vspace{0.06cm}
+\noindent
+\begin{tabularx}{\textwidth}{@{}X X@{}}
+(a) 7 & (b) 8 \\[3pt]
+(c) 9 & (d) 15 \\
+\end{tabularx}
+
+\vspace{0.22cm}
+
+\noindent \textbf{14.} What is printed when \texttt{post} is called on the root of the syntax tree for \texttt{a + b * c}? \hfill \textbf{[2 Marks]}
+\begin{lstlisting}
+typedef struct node {
+    char ch;
+    struct node *l, *r;
+} Node;
+
+void post(Node *t) {
+    if (t) {
+        post(t->l);
+        post(t->r);
+        printf("%c", t->ch);
+    }
+}
+\end{lstlisting}
+% ans: C
+\vspace{0.06cm}
+\noindent
+\begin{tabularx}{\textwidth}{@{}X X@{}}
+(a) \texttt{+a*bc} & (b) \texttt{a+b*c} \\[3pt]
+(c) \texttt{abc*+} & (d) \texttt{ab+c*} \\
+\end{tabularx}
+
+\vspace{0.22cm}
+
+\noindent \textbf{15.} Which sequence is the correct three-address code for the statement \texttt{x = a + b * c - d}? \hfill \textbf{[2 Marks]}
+% ans: A
+\vspace{0.06cm}
+\noindent
+\begin{tabularx}{\textwidth}{@{}X X@{}}
+(a) \texttt{t1 = b * c; t2 = a + t1; t3 = t2 - d; x = t3} & (b) \texttt{t1 = a + b; t2 = t1 * c; t3 = t2 - d; x = t3} \\[3pt]
+(c) \texttt{t1 = c - d; t2 = b * t1; t3 = a + t2; x = t3} & (d) \texttt{t1 = a + b; t2 = c - d; t3 = t1 * t2; x = t3} \\
+\end{tabularx}
+
+\vspace{0.25cm}
+\noindent\rule{\textwidth}{0.4pt}
+\vspace{0.2cm}
+
+%======================================================================
+% SECTION B: LEX / FLEX (Q16 - Q30)
+%======================================================================
+
+\noindent \textbf{16.} A Lex specification file consists of three sections separated by \texttt{\%\%}. The correct order of these sections is: \hfill \textbf{[2 Marks]}
+% ans: D
+\vspace{0.06cm}
+\noindent
+\begin{tabularx}{\textwidth}{@{}X X@{}}
+(a) rules, definitions, user subroutines & (b) user subroutines, rules, definitions \\[3pt]
+(c) rules, user subroutines, definitions & (d) definitions, rules, user subroutines \\
+\end{tabularx}
+
+\vspace{0.22cm}
+
+\noindent \textbf{17.} What is the output of the following Lex program for the input \texttt{ab12 c3}? \hfill \textbf{[2 Marks]}
+\begin{lstlisting}
+%%
+[0-9]+     { printf("NUM "); }
+[a-z]+     { printf("ID "); }
+.|\n       { ; }
+%%
+int main() { yylex(); return 0; }
+int yywrap() { return 1; }
+\end{lstlisting}
+% ans: A
+\vspace{0.06cm}
+\noindent
+\begin{tabularx}{\textwidth}{@{}X X@{}}
+(a) \texttt{ID NUM ID NUM} & (b) \texttt{ID NUM NUM} \\[3pt]
+(c) \texttt{ID ID NUM NUM} & (d) \texttt{ab12 c3} \\
+\end{tabularx}
+
+\vspace{0.22cm}
+
+\noindent \textbf{18.} What is the output of the following Lex program for the input \texttt{int integer}? \hfill \textbf{[2 Marks]}
+\begin{lstlisting}
+%%
+"int"     { printf("KEY "); }
+[a-z]+    { printf("ID "); }
+[ \t\n]   ;
+%%
+int main() { yylex(); return 0; }
+int yywrap() { return 1; }
+\end{lstlisting}
+% ans: C
+\vspace{0.06cm}
+\noindent
+\begin{tabularx}{\textwidth}{@{}X X@{}}
+(a) \texttt{KEY KEY ID} & (b) \texttt{ID ID} \\[3pt]
+(c) \texttt{KEY ID} & (d) \texttt{ID KEY} \\
+\end{tabularx}
+
+\vspace{0.22cm}
+
+\noindent \textbf{19.} The following Lex fragment counts words and characters. Choose the option that fills the blank so that \texttt{chars} counts every character of each word. \hfill \textbf{[2 Marks]}
+\begin{lstlisting}
+%{
+int words = 0, chars = 0;
+%}
+%%
+[^ \t\n]+   { words++; chars += ______; }
+.|\n        { chars++; }
+%%
+\end{lstlisting}
+% ans: B
+\vspace{0.06cm}
+\noindent
+\begin{tabularx}{\textwidth}{@{}X X@{}}
+(a) \texttt{yytext} & (b) \texttt{yyleng} \\[3pt]
+(c) \texttt{yylex} & (d) \texttt{yyin} \\
+\end{tabularx}
+
+\vspace{0.22cm}
+
+\noindent \textbf{20.} When \texttt{yylex()} reaches the end of the current input, it calls \texttt{yywrap()}. If \texttt{yywrap()} returns \texttt{1}, then: \hfill \textbf{[2 Marks]}
+% ans: D
+\vspace{0.06cm}
+\noindent
+\begin{tabularx}{\textwidth}{@{}X X@{}}
+(a) the scanner restarts reading the same file & (b) the scanner assumes another input has been set in \texttt{yyin} and continues \\[3pt]
+(c) Lex reports an error & (d) the scanner terminates and returns to the caller \\
+\end{tabularx}
+
+\vspace{0.22cm}
+
+\noindent \textbf{21.} In a Lex program that counts lines, words and characters for several files given on the command line, choose the correct statement for the blank. \hfill \textbf{[2 Marks]}
+\begin{lstlisting}
+int main(int argc, char *argv[]) {
+    int i;
+    for (i = 1; i < argc; i++) {
+        yyin = ______;
+        yylex();
+        /* print counts of this file, add to totals, reset counters */
+    }
+    return 0;
+}
+int yywrap() { return 1; }
+\end{lstlisting}
+% ans: A
+\vspace{0.06cm}
+\noindent
+\begin{tabularx}{\textwidth}{@{}X X@{}}
+(a) \texttt{fopen(argv[i], "r")} & (b) \texttt{argv[i]} \\[3pt]
+(c) \texttt{fopen(argv[i], "w")} & (d) \texttt{open(argv[i])} \\
+\end{tabularx}
+
+\vspace{0.22cm}
+
+\noindent \textbf{22.} A Lex rule for floating-point constants (zero or more digits, a literal dot, then one or more digits) is written as \verb|[0-9]*.[0-9]+|, but it wrongly accepts \texttt{12x5} as a float. Which rule is the correct version? \hfill \textbf{[2 Marks]}
+% ans: C
+\vspace{0.06cm}
+\noindent
+\begin{tabularx}{\textwidth}{@{}X X@{}}
+(a) \verb|[0-9]*.[0-9]*| & (b) \verb|[0-9]*\\.[0-9]+| \\[3pt]
+(c) \verb|[0-9]*\.[0-9]+| & (d) \verb|[0-9]*\.[0-9]*| \\
+\end{tabularx}
+
+\vspace{0.22cm}
+
+\noindent \textbf{23.} Using the pattern \texttt{[a-zA-Z\_][a-zA-Z0-9\_]*} for identifiers, which of the following is \textbf{not} recognised as a single identifier token? \hfill \textbf{[2 Marks]}
+% ans: B
+\vspace{0.06cm}
+\noindent
+\begin{tabularx}{\textwidth}{@{}X X@{}}
+(a) \texttt{\_count1} & (b) \texttt{2var} \\[3pt]
+(c) \texttt{var\_2} & (d) \texttt{Total} \\
+\end{tabularx}
+
+\vspace{0.22cm}
+
+\noindent \textbf{24.} What does the following Lex program print for the input \texttt{int x1 if y 25}? \hfill \textbf{[2 Marks]}
+\begin{lstlisting}
+%{
+int k = 0, id = 0, num = 0;
+%}
+%%
+"if"|"int"|"float"   { k++; }
+[a-z][a-z0-9]*       { id++; }
+[0-9]+               { num++; }
+.|\n                 { ; }
+%%
+int main() { yylex(); printf("%d %d %d", k, id, num); return 0; }
+int yywrap() { return 1; }
+\end{lstlisting}
+% ans: D
+\vspace{0.06cm}
+\noindent
+\begin{tabularx}{\textwidth}{@{}X X@{}}
+(a) \texttt{0 4 1} & (b) \texttt{2 1 2} \\[3pt]
+(c) \texttt{2 2 0} & (d) \texttt{2 2 1} \\
+\end{tabularx}
+
+\vspace{0.22cm}
+
+\noindent \textbf{25.} In a Lex program, input characters that do not match any rule are: \hfill \textbf{[2 Marks]}
+% ans: A
+\vspace{0.06cm}
+\noindent
+\begin{tabularx}{\textwidth}{@{}X X@{}}
+(a) copied to the output (stdout) by the default action & (b) treated as a fatal error \\[3pt]
+(c) silently discarded & (d) stored only in \texttt{yytext} and never printed \\
+\end{tabularx}
+
+\vspace{0.22cm}
+
+\noindent \textbf{26.} Why can Lex alone \textbf{not} verify that the parentheses in an arithmetic expression are properly balanced and nested? \hfill \textbf{[2 Marks]}
+% ans: C
+\vspace{0.06cm}
+\noindent
+\begin{tabularx}{\textwidth}{@{}X X@{}}
+(a) Lex does not allow the parenthesis characters in patterns & (b) \texttt{yytext} is too short to hold parentheses \\[3pt]
+(c) Lex patterns describe regular languages (finite automata) which cannot count nesting depth & (d) \texttt{yylex()} can only return integer tokens \\
+\end{tabularx}
+
+\vspace{0.22cm}
+
+\noindent \textbf{27.} In an arithmetic calculator written in Lex, the rule \verb|[+-*/%]| gives an error (reversed range). Which character class correctly matches exactly the five operators \texttt{+ - * / \%}? \hfill \textbf{[2 Marks]}
+% ans: D
+\vspace{0.06cm}
+\noindent
+\begin{tabularx}{\textwidth}{@{}X X@{}}
+(a) \verb|[+-*/%]| & (b) \verb|[+*-/%]| \\[3pt]
+(c) \verb|[+ - * / %]| & (d) \verb|[-+*/%]| \\
+\end{tabularx}
+
+\vspace{0.22cm}
+
+\noindent \textbf{28.} In a C code analyzer, function names are to be recognised only when an identifier is \emph{followed by} \texttt{(}, without consuming the \texttt{(} itself. Choose the operator that fills the blank. \hfill \textbf{[2 Marks]}
+\begin{lstlisting}
+[a-zA-Z_][a-zA-Z0-9_]* ______ "("   { printf("Function: %s\n", yytext); }
+\end{lstlisting}
+% ans: B
+\vspace{0.06cm}
+\noindent
+\begin{tabularx}{\textwidth}{@{}X X@{}}
+(a) \verb/|/ & (b) \texttt{/} \\[3pt]
+(c) \verb|\| & (d) \texttt{\&} \\
+\end{tabularx}
+
+\vspace{0.22cm}
+
+\noindent \textbf{29.} What is the output of the following Lex program for the input \texttt{aaabab}? \hfill \textbf{[2 Marks]}
+\begin{lstlisting}
+%%
+a*b      { printf("[%s]", yytext); }
+.|\n     { ; }
+%%
+int main() { yylex(); return 0; }
+int yywrap() { return 1; }
+\end{lstlisting}
+% ans: A
+\vspace{0.06cm}
+\noindent
+\begin{tabularx}{\textwidth}{@{}X X@{}}
+(a) \texttt{[aaab][ab]} & (b) \texttt{[aaabab]} \\[3pt]
+(c) \texttt{[aaab][a][b]} & (d) \texttt{[aaa][b][a][b]} \\
+\end{tabularx}
+
+\vspace{0.22cm}
+
+\noindent \textbf{30.} Which sequence of commands correctly builds and runs a Lex program \texttt{prog.l} on Linux? \hfill \textbf{[2 Marks]}
+% ans: C
+\vspace{0.06cm}
+\noindent
+\begin{tabularx}{\textwidth}{@{}X X@{}}
+(a) \texttt{gcc prog.l -lfl ; ./a.out} & (b) \texttt{flex prog.l ; ./lex.yy.c} \\[3pt]
+(c) \texttt{flex prog.l ; gcc lex.yy.c -lfl ; ./a.out} & (d) \texttt{lex prog.l ; gcc prog.l ; ./a.out} \\
+\end{tabularx}
+
+\vspace{0.25cm}
+\noindent\rule{\textwidth}{0.4pt}
+\vspace{0.2cm}
+
+%======================================================================
+% SECTION C: YACC / BISON (Q31 - Q45)
+%======================================================================
+
+\noindent \textbf{31.} Which command generates the header file \texttt{y.tab.h} containing the token definitions for \texttt{prog.y}? \hfill \textbf{[2 Marks]}
+% ans: B
+\vspace{0.06cm}
+\noindent
+\begin{tabularx}{\textwidth}{@{}X X@{}}
+(a) \texttt{yacc prog.y} & (b) \texttt{yacc -d prog.y} \\[3pt]
+(c) \texttt{yacc -v prog.y} & (d) \texttt{yacc -t prog.y} \\
+\end{tabularx}
+
+\vspace{0.22cm}
+
+\noindent \textbf{32.} The parser generated by Yacc/Bison is of type: \hfill \textbf{[2 Marks]}
+% ans: C
+\vspace{0.06cm}
+\noindent
+\begin{tabularx}{\textwidth}{@{}X X@{}}
+(a) LL(1) top-down parser & (b) operator-precedence parser \\[3pt]
+(c) LALR(1) bottom-up parser & (d) recursive-descent parser \\
+\end{tabularx}
+
+\vspace{0.22cm}
+
+\noindent \textbf{33.} Choose the option that fills the blank so that \texttt{*} and \texttt{/} get higher precedence than \texttt{+} and \texttt{-}. \hfill \textbf{[2 Marks]}
+\begin{lstlisting}
+%token NUM
+%left '+' '-'
+%left ______
+%%
+\end{lstlisting}
+% ans: A
+\vspace{0.06cm}
+\noindent
+\begin{tabularx}{\textwidth}{@{}X X@{}}
+(a) \texttt{'*' '/'} & (b) \texttt{'*'} \\[3pt]
+(c) \texttt{'(' ')'} & (d) \texttt{NUM} \\
+\end{tabularx}
+
+\vspace{0.22cm}
+
+\noindent \textbf{34.} What is printed for the input \texttt{2+3*4} followed by a newline? \hfill \textbf{[2 Marks]}
+\begin{lstlisting}
+%token NUM
+%left '+' '-'
+%left '*' '/'
+%%
+S : E '\n'      { printf("%d\n", $1); }
+  ;
+E : E '+' E     { $$ = $1 + $3; }
+  | E '*' E     { $$ = $1 * $3; }
+  | NUM         { $$ = $1; }
+  ;
+%%
+\end{lstlisting}
+% ans: D
+\vspace{0.06cm}
+\noindent
+\begin{tabularx}{\textwidth}{@{}X X@{}}
+(a) \texttt{20} & (b) \texttt{24} \\[3pt]
+(c) \texttt{9} & (d) \texttt{14} \\
+\end{tabularx}
+
+\vspace{0.22cm}
+
+\noindent \textbf{35.} What is printed for the input \texttt{10-4-3} followed by a newline? \hfill \textbf{[2 Marks]}
+\begin{lstlisting}
+%token NUM
+%right '-'
+%%
+S : E '\n'      { printf("%d\n", $1); }
+  ;
+E : E '-' E     { $$ = $1 - $3; }
+  | NUM         { $$ = $1; }
+  ;
+%%
+\end{lstlisting}
+% ans: B
+\vspace{0.06cm}
+\noindent
+\begin{tabularx}{\textwidth}{@{}X X@{}}
+(a) \texttt{3} & (b) \texttt{9} \\[3pt]
+(c) \texttt{11} & (d) syntax error \\
+\end{tabularx}
+
+\vspace{0.22cm}
+
+\noindent \textbf{36.} In the rule \texttt{E : E '+' T \{ \$\$ = \$1 + \$3; \}}, the symbol \texttt{\$3} refers to: \hfill \textbf{[2 Marks]}
+% ans: C
+\vspace{0.06cm}
+\noindent
+\begin{tabularx}{\textwidth}{@{}X X@{}}
+(a) the token \texttt{'+'} & (b) the value of \texttt{E} on the left-hand side \\[3pt]
+(c) the semantic value associated with \texttt{T} & (d) the third character of the input \\
+\end{tabularx}
+
+\vspace{0.22cm}
+
+\noindent \textbf{37.} In the Lex file, choose the option that fills the blank so that the numeric value of the token is passed to Yacc. \hfill \textbf{[2 Marks]}
+\begin{lstlisting}
+%{
+#include "y.tab.h"
+#include <stdlib.h>
+%}
+%%
+[0-9]+   { ______ = atoi(yytext); return NUM; }
+\end{lstlisting}
+% ans: A
+\vspace{0.06cm}
+\noindent
+\begin{tabularx}{\textwidth}{@{}X X@{}}
+(a) \texttt{yylval} & (b) \texttt{yytext} \\[3pt]
+(c) \texttt{\$\$} & (d) \texttt{yyval} \\
+\end{tabularx}
+
+\vspace{0.22cm}
+
+\noindent \textbf{38.} The following Yacc file, compiled together with Lex's \texttt{lex.yy.c}, fails at link time with \emph{``undefined reference to yyerror''}. What is the correct fix? \hfill \textbf{[2 Marks]}
+\begin{lstlisting}
+%{
+#include <stdio.h>
+int yylex(void);
+%}
+%token NUM
+%%
+S : E '\n'        { printf("%d\n", $1); } ;
+E : E '+' NUM     { $$ = $1 + $3; }
+  | NUM           { $$ = $1; }
+  ;
+%%
+int main() { return yyparse(); }
+\end{lstlisting}
+% ans: D
+\vspace{0.06cm}
+\noindent
+\begin{tabularx}{\textwidth}{@{}X X@{}}
+(a) Add \texttt{\%token yyerror} in the declarations section & (b) Add \texttt{int yyerror;} in the declarations section \\[3pt]
+(c) Remove the \texttt{main()} function & (d) Define \texttt{void yyerror(char *s) \{ fprintf(stderr, "\%s\textbackslash n", s); \}} in user subroutines \\
+\end{tabularx}
+
+\vspace{0.22cm}
+
+\noindent \textbf{39.} Compiling \texttt{lex.yy.c} generated from the following Lex file gives the error \emph{``NUM undeclared''}. What is the correct fix? \hfill \textbf{[2 Marks]}
+\begin{lstlisting}
+%{
+#include <stdlib.h>
+%}
+%%
+[0-9]+   { yylval = atoi(yytext); return NUM; }
+\n       { return '\n'; }
+[ \t]    ;
+.        { return yytext[0]; }
+%%
+\end{lstlisting}
+% ans: B
+\vspace{0.06cm}
+\noindent
+\begin{tabularx}{\textwidth}{@{}X X@{}}
+(a) Declare \texttt{int NUM;} inside the Lex rules section & (b) Add \texttt{\#include "y.tab.h"} in the \texttt{\%\{ ... \%\}} block (produced by \texttt{yacc -d}) \\[3pt]
+(c) Replace \texttt{NUM} with \texttt{'NUM'} & (d) Remove the \texttt{return} statement \\
+\end{tabularx}
+
+\vspace{0.22cm}
+
+\noindent \textbf{40.} The grammar $E \rightarrow E+E \mid E*E \mid \text{id}$ is given to Yacc without any precedence declarations. Yacc reports shift/reduce conflicts. By default, Yacc resolves a shift/reduce conflict by: \hfill \textbf{[2 Marks]}
+% ans: A
+\vspace{0.06cm}
+\noindent
+\begin{tabularx}{\textwidth}{@{}X X@{}}
+(a) choosing to shift & (b) choosing to reduce \\[3pt]
+(c) aborting with a fatal error & (d) choosing randomly \\
+\end{tabularx}
+
+\vspace{0.22cm}
+
+\noindent \textbf{41.} The function \texttt{yyparse()} returns: \hfill \textbf{[2 Marks]}
+% ans: D
+\vspace{0.06cm}
+\noindent
+\begin{tabularx}{\textwidth}{@{}X X@{}}
+(a) the number of tokens read & (b) \texttt{1} on success and \texttt{0} on failure \\[3pt]
+(c) the semantic value of the start symbol & (d) \texttt{0} if parsing succeeds, and \texttt{1} if parsing fails due to a syntax error \\
+\end{tabularx}
+
+\vspace{0.22cm}
+
+\noindent \textbf{42.} Left recursion such as $E \rightarrow E + T \mid T$ is normally written as is in a Yacc grammar (no elimination needed) because: \hfill \textbf{[2 Marks]}
+% ans: C
+\vspace{0.06cm}
+\noindent
+\begin{tabularx}{\textwidth}{@{}X X@{}}
+(a) Yacc cannot handle right recursion at all & (b) left recursion causes an infinite loop in an LALR parser \\[3pt]
+(c) a bottom-up LALR parser handles left recursion directly and keeps the stack shallow for lists & (d) left recursion is required to make a grammar ambiguous \\
+\end{tabularx}
+
+\vspace{0.22cm}
+
+\noindent \textbf{43.} Choose the option that fills the blank so that, on a syntax error in an expression line, Yacc prints a message and then continues with the next line. \hfill \textbf{[2 Marks]}
+\begin{lstlisting}
+S : E '\n'     { printf("%d\n", $1); }
+  | ______ '\n'   { printf("Syntax error\n"); yyerrok; }
+  ;
+\end{lstlisting}
+% ans: B
+\vspace{0.06cm}
+\noindent
+\begin{tabularx}{\textwidth}{@{}X X@{}}
+(a) \texttt{yyerror} & (b) \texttt{error} \\[3pt]
+(c) \texttt{yyerrok} & (d) \texttt{\%error} \\
+\end{tabularx}
+
+\vspace{0.22cm}
+
+\noindent \textbf{44.} What is printed for the input \texttt{(2+3)*4} followed by a newline? \hfill \textbf{[2 Marks]}
+\begin{lstlisting}
+%token NUM
+%left '+' '-'
+%left '*' '/'
+%%
+S : E '\n'        { printf("%d\n", $1); }
+  ;
+E : E '+' E       { $$ = $1 + $3; }
+  | E '*' E       { $$ = $1 * $3; }
+  | '(' E ')'     { $$ = $2; }
+  | NUM           { $$ = $1; }
+  ;
+%%
+\end{lstlisting}
+% ans: D
+\vspace{0.06cm}
+\noindent
+\begin{tabularx}{\textwidth}{@{}X X@{}}
+(a) \texttt{14} & (b) \texttt{24} \\[3pt]
+(c) \texttt{9} & (d) \texttt{20} \\
+\end{tabularx}
+
+\vspace{0.22cm}
+
+\noindent \textbf{45.} While parsing, \texttt{yyparse()} obtains each input token by calling which function? \hfill \textbf{[2 Marks]}
+% ans: A
+\vspace{0.06cm}
+\noindent
+\begin{tabularx}{\textwidth}{@{}X X@{}}
+(a) \texttt{yylex()} & (b) \texttt{yywrap()} \\[3pt]
+(c) \texttt{main()} & (d) \texttt{yyerror()} \\
+\end{tabularx}
+
+\vspace{0.3cm}
+\noindent\rule{\textwidth}{0.6pt}
+\vspace{0.2cm}
+\begin{center}
+\textit{--- End of Master Question Paper (Total 45 Questions) ---}
+\end{center}
+
+\end{document}
+
