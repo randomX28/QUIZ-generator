@@ -27,8 +27,8 @@ class Settings:
     DEFAULT_BANK_COURSE: str = "NCSC302"
     DEFAULT_POOL_COUNT: int = 5
 
-    # Server configuration
-    HOST: str = os.getenv("HOST", "127.0.0.1")
+    # Server configuration (0.0.0.0 enables local Wi-Fi / mobile access)
+    HOST: str = os.getenv("HOST", "0.0.0.0")
     PORT: int = int(os.getenv("PORT", 8000))
 
     def get_bank_output_dir(self, bank_id: int | None = None) -> Path:

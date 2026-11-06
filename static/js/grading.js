@@ -125,16 +125,17 @@ async function loadPaperForGrading() {
 // ── Render question form ───────────────────────────────────────────────────
 function renderGradingForm(paper) {
   const form = document.getElementById('questions-form');
+  const fmt = window.formatRichText || esc;
   form.innerHTML = paper.questions.map(q => `
     <div class="grade-question" data-q="${q.q_index}">
       <div class="grade-q-num">Question ${q.q_index + 1}</div>
-      <div class="grade-q-text">${esc(q.text)}</div>
+      <div class="grade-q-text">${fmt(q.text)}</div>
       <div class="grade-options">
         ${['a', 'b', 'c', 'd'].map(lbl => `
           <label class="grade-option" id="opt-${q.q_index}-${lbl}" data-q="${q.q_index}" data-lbl="${lbl}">
             <input type="radio" name="q${q.q_index}" value="${lbl}" />
             <span class="opt-label">${lbl.toUpperCase()}</span>
-            <span>${esc(q.options[lbl])}</span>
+            <span>${fmt(q.options[lbl])}</span>
           </label>
         `).join('')}
       </div>
@@ -156,6 +157,7 @@ function renderGradingForm(paper) {
     card.addEventListener('click', () => updateActiveQuestionFocus(idx));
   });
   updateActiveQuestionFocus(0);
+  window.renderMathInPage?.(form);
 }
 
 // ── Step 2: Submit and grade ───────────────────────────────────────────────
@@ -204,6 +206,9 @@ async function submitGrade() {
   btn.disabled = true;
   btn.textContent = 'Grading…';
 
+  const taNameInput = document.getElementById('ta-evaluator-name');
+  const enteredBy = taNameInput?.value.trim() || 'TA';
+
   try {
     const result = await apiFetch('/api/grade', {
       method: 'POST',
@@ -211,12 +216,19 @@ async function submitGrade() {
         roll_no: rollNo,
         paper_uid: currentPaperUid,
         responses,
-        entered_by: 'TA',
+        entered_by: enteredBy,
       })
     });
     renderResult(result);
     document.getElementById('step-result').classList.remove('hidden');
     document.getElementById('step-result').scrollIntoView({ behavior: 'smooth' });
+
+    // Update Session Graded Counter
+    const curCount = parseInt(sessionStorage.getItem('cd_ta_session_count') || '0') + 1;
+    sessionStorage.setItem('cd_ta_session_count', String(curCount));
+    const countEl = document.getElementById('ta-session-count');
+    if (countEl) countEl.textContent = String(curCount);
+
     toast(`Graded: ${rollNo} scored ${result.score}/${result.total}`, 'success');
   } catch (e) {
     toast(e.message, 'error');
@@ -380,3 +392,20 @@ if (bulkFileInput) {
     }
   });
 }
+
+// ── Evaluator Identity & Session Init ──────────────────────────────────────
+document.addEventListener('DOMContentLoaded', () => {
+  const taNameInput = document.getElementById('ta-evaluator-name');
+  if (taNameInput) {
+    const savedName = localStorage.getItem('cd_ta_name') || '';
+    taNameInput.value = savedName;
+    taNameInput.addEventListener('input', (e) => {
+      localStorage.setItem('cd_ta_name', e.target.value.trim());
+    });
+  }
+
+  const countEl = document.getElementById('ta-session-count');
+  if (countEl) {
+    countEl.textContent = sessionStorage.getItem('cd_ta_session_count') || '0';
+  }
+});

@@ -501,6 +501,125 @@ body {
   }
 }
 
+/* ── TA-Lock Evaluator Mode ────────────────────────────────────────── */
+body.ta-mode-active #nav-admin,
+body.ta-mode-active #nav-papers,
+body.ta-mode-active #nav-answers,
+body.ta-mode-active #mobile-nav-admin,
+body.ta-mode-active #mobile-nav-papers,
+body.ta-mode-active #mobile-nav-answers,
+body.ta-mode-active #btn-new-bank,
+body.ta-mode-active #btn-delete-bank,
+body.ta-mode-active #btn-share-ta-portal,
+body.ta-mode-active .coverage-wrap {
+  display: none !important;
+}
+
+body.ta-mode-active .ta-mode-indicator {
+  display: inline-flex !important;
+}
+
+.ta-mode-indicator {
+  display: none;
+  align-items: center;
+  gap: 0.45rem;
+  background: var(--primary-container);
+  color: var(--accent-blue);
+  border: 1px solid var(--accent-blue);
+  border-radius: var(--radius-full);
+  padding: 0.25rem 0.65rem;
+  font-size: 0.76rem;
+  font-weight: 700;
+}
+
+/* Evaluator Profile Banner in TA Grading */
+.ta-profile-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  background: var(--bg-surface-high);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-md);
+  padding: 0.85rem 1.25rem;
+  margin-bottom: 1.25rem;
+  flex-wrap: wrap;
+}
+.ta-profile-fields {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+.ta-name-input {
+  max-width: 170px !important;
+  height: 36px !important;
+  font-size: 0.85rem !important;
+  padding: 0.35rem 0.65rem !important;
+  border-radius: var(--radius-sm) !important;
+}
+.ta-session-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: var(--bg-surface);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-full);
+  padding: 0.35rem 0.85rem;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--accent-blue);
+}
+
+/* Share TA Portal Modal */
+.qr-modal-body {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 1.25rem;
+  padding: 1.5rem 1.75rem;
+}
+.qr-canvas-wrap {
+  background: #ffffff;
+  padding: 0.85rem;
+  border-radius: var(--radius-md);
+  box-shadow: var(--elevation-2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--outline-subtle);
+}
+.qr-url-box {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: var(--bg-surface-high);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-md);
+  padding: 0.4rem 0.6rem;
+  width: 100%;
+}
+.qr-url-input {
+  flex: 1;
+  background: transparent !important;
+  border: none !important;
+  font-family: 'JetBrains Mono', monospace !important;
+  font-size: 0.84rem !important;
+  color: var(--text-primary) !important;
+  outline: none !important;
+}
+
+[data-theme="dark"] .ta-profile-banner {
+  background: #111a2c;
+  border-color: #1f2d47;
+}
+[data-theme="dark"] .ta-session-chip {
+  background: #19243b;
+  border-color: #253553;
+  color: #2dd4bf;
+}
+
 /* ── Main Canvas ───────────────────────────────────────────────────── */
 .main-content {
   flex: 1; overflow-y: auto;

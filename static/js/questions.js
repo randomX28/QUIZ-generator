@@ -8,17 +8,50 @@ let pendingLatexFile = null;
 // ── Rich Text & Math Rendering Helpers ─────────────────────────────────────
 function formatRichText(raw) {
   if (!raw) return '';
-  let str = esc(raw);
+  let str = (window.esc || esc)(raw);
 
-  // Convert \begin{lstlisting} ... \end{lstlisting} into styled pre/code blocks
+  // 1. Code blocks: \begin{lstlisting} ... \end{lstlisting}
   str = str.replace(/\\begin\{lstlisting\}([\s\S]*?)\\end\{lstlisting\}/g, (_, code) => {
     return `<pre class="q-code-snippet"><code>${code.trim()}</code></pre>`;
   });
 
-  // Convert \texttt{...} into inline code pills
+  // 2. Inline verbatim / code: \verb|...| and \texttt{...}
+  str = str.replace(/\\verb([^\w\s])(.*?)\1/g, (_, delim, code) => {
+    return `<code class="q-inline-code">${code}</code>`;
+  });
   str = str.replace(/\\texttt\{([^}]+)\}/g, (_, inner) => {
     return `<code class="q-inline-code">${inner}</code>`;
   });
+
+  // 3. LaTeX text styling macros: \emph, \textit, \textbf, \underline
+  str = str.replace(/\\emph\{([^}]+)\}/g, '<em>$1</em>');
+  str = str.replace(/\\textit\{([^}]+)\}/g, '<em>$1</em>');
+  str = str.replace(/\\textbf\{([^}]+)\}/g, '<strong>$1</strong>');
+  str = str.replace(/\\underline\{([^}]+)\}/g, '<u>$1</u>');
+  str = str.replace(/\\textsf\{([^}]+)\}/g, '<span style="font-family:sans-serif">$1</span>');
+  str = str.replace(/\\textsc\{([^}]+)\}/g, '<span style="font-variant:small-caps">$1</span>');
+
+  // 4. LaTeX quotation marks & dashes
+  str = str.replace(/``([^'']+)''/g, '“$1”');
+  str = str.replace(/`([^']*)'/g, '‘$1’');
+  str = str.replace(/---/g, '—');
+  str = str.replace(/--/g, '–');
+  str = str.replace(/\\ldots/g, '…');
+  str = str.replace(/\\dots/g, '…');
+
+  // 5. LaTeX spacing macros outside / between math blocks
+  // e.g. $S \rightarrow Aa \mid b$, \quad $A \rightarrow Sc \mid d$
+  str = str.replace(/\\qquad\b/g, '&emsp;&emsp;');
+  str = str.replace(/\\quad\b/g, '&emsp;');
+  str = str.replace(/\\,\b/g, '&thinsp;');
+  str = str.replace(/\\;\b/g, '&ensp;');
+  str = str.replace(/\\:\b/g, '&ensp;');
+  str = str.replace(/\\ /g, '&nbsp;');
+
+  // 6. Stray arrow or separator macros
+  str = str.replace(/\\rightarrow\b/g, '→');
+  str = str.replace(/\\to\b/g, '→');
+  str = str.replace(/\\Rightarrow\b/g, '⇒');
 
   return str;
 }
@@ -431,7 +464,7 @@ function openImportPreviewModal(previewData, onConfirm) {
             ${isDup ? `<span style="font-size:0.72rem;font-weight:700;color:var(--accent-red);background:rgba(239,68,68,0.12);padding:0.15rem 0.5rem;border-radius:var(--radius-full)">⚠ Duplicate in Bank</span>` : ''}
           </div>
           <div style="font-size:0.88rem;font-weight:600;color:var(--text-primary);line-height:1.45">
-            ${esc(q.text)}
+            ${formatRichText(q.text)}
           </div>
           ${!isSubj ? `
             <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:0.35rem;font-size:0.78rem;margin-top:0.2rem">
@@ -441,7 +474,7 @@ function openImportPreviewModal(previewData, onConfirm) {
                 return `
                   <div style="display:flex;align-items:center;gap:0.35rem;padding:0.25rem 0.45rem;border-radius:var(--radius-xs);background:${isCorrect ? 'rgba(16,185,129,0.15)' : 'var(--bg-surface-high)'};border:1px solid ${isCorrect ? 'rgba(16,185,129,0.4)' : 'transparent'};color:${isCorrect ? 'var(--accent-green)' : 'var(--text-secondary)'};font-weight:${isCorrect ? '700' : '500'}">
                     <span style="font-family:'JetBrains Mono',monospace;font-weight:700">(${optKey.toUpperCase()})</span>
-                    <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(optVal)}</span>
+                    <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${formatRichText(optVal)}</span>
                     ${isCorrect ? `<span style="margin-left:auto;font-size:0.68rem">✓ Correct</span>` : ''}
                   </div>
                 `;

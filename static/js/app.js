@@ -133,18 +133,82 @@ function escHtml(s) {
 
 document.getElementById('bank-select')?.addEventListener('change', e => switchBank(e.target.value));
 
-// Coverage Popover Toggle
-const coverageBtn = document.getElementById('btn-pool-coverage-toggle');
-const coveragePopover = document.getElementById('popover-pool-coverage');
-coverageBtn?.addEventListener('click', (e) => {
-  e.stopPropagation();
-  coveragePopover?.classList.toggle('hidden');
+// ── TA-Lock Evaluator Mode & Share Modal ───────────────────────────
+const ADMIN_PIN = '1234';
+
+function isTaMode() {
+  const urlParams = new URLSearchParams(window.location.search);
+  const role = urlParams.get('role') || urlParams.get('mode') || urlParams.get('ta');
+  if (role === 'ta' || role === 'grader' || role === '1') {
+    sessionStorage.setItem('cd_app_role', 'ta');
+    return true;
+  }
+  return sessionStorage.getItem('cd_app_role') === 'ta';
+}
+
+function applyTaMode(active) {
+  document.body.classList.toggle('ta-mode-active', active);
+  if (active) {
+    sessionStorage.setItem('cd_app_role', 'ta');
+    switchTab('grading');
+  } else {
+    sessionStorage.removeItem('cd_app_role');
+  }
+}
+
+function promptUnlockAdmin() {
+  const entered = prompt('Enter Admin PIN to unlock full dashboard:', '');
+  if (entered === null) return;
+  if (entered.trim() === ADMIN_PIN) {
+    applyTaMode(false);
+    toast('Admin dashboard unlocked', 'success');
+  } else {
+    toast('Incorrect Admin PIN', 'error');
+  }
+}
+
+document.getElementById('btn-unlock-admin')?.addEventListener('click', promptUnlockAdmin);
+
+// Share TA Portal Modal
+const shareModal = document.getElementById('modal-ta-share-backdrop');
+const shareBtn = document.getElementById('btn-share-ta-portal');
+const closeShareBtn = document.getElementById('btn-close-ta-share');
+const doneShareBtn = document.getElementById('btn-done-ta-share');
+const copyUrlBtn = document.getElementById('btn-copy-ta-url');
+const urlInput = document.getElementById('ta-share-url');
+
+function openShareModal() {
+  if (!shareModal) return;
+  const taUrl = `${window.location.origin}/?role=ta`;
+  if (urlInput) urlInput.value = taUrl;
+  shareModal.classList.remove('hidden');
+
+  const canvas = document.getElementById('ta-portal-qr');
+  if (canvas && window.renderQRCodeToCanvas) {
+    window.renderQRCodeToCanvas(canvas, taUrl, 180);
+  }
+}
+
+function closeShareModal() {
+  if (shareModal) shareModal.classList.add('hidden');
+}
+
+shareBtn?.addEventListener('click', openShareModal);
+closeShareBtn?.addEventListener('click', closeShareModal);
+doneShareBtn?.addEventListener('click', closeShareModal);
+shareModal?.addEventListener('click', (e) => {
+  if (e.target === shareModal) closeShareModal();
 });
-document.addEventListener('click', (e) => {
-  if (coveragePopover && !coveragePopover.classList.contains('hidden')) {
-    if (!coveragePopover.contains(e.target) && e.target !== coverageBtn && !coverageBtn?.contains(e.target)) {
-      coveragePopover.classList.add('hidden');
-    }
+
+copyUrlBtn?.addEventListener('click', async () => {
+  if (!urlInput) return;
+  try {
+    await navigator.clipboard.writeText(urlInput.value);
+    toast('TA Portal link copied to clipboard!', 'success');
+  } catch (_) {
+    urlInput.select();
+    document.execCommand('copy');
+    toast('TA Portal link copied!', 'success');
   }
 });
 
@@ -173,5 +237,9 @@ window.escHtml      = escHtml;
     console.error('Initial load failed', e);
   }
   window.onBankChanged?.();
-  switchTab('admin');
+  if (isTaMode()) {
+    applyTaMode(true);
+  } else {
+    switchTab('admin');
+  }
 })();
